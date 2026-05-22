@@ -82,14 +82,14 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
       )}
     >
       {isCoach && (
-        <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 mt-1 shadow-lg shadow-primary/20">
+        <div className="hidden md:flex w-8 h-8 rounded-full bg-primary items-center justify-center shrink-0 mt-1 shadow-lg shadow-primary/20">
           <Heart className="w-4 h-4 text-primary-foreground" />
         </div>
       )}
       
       <div
         className={cn(
-          "max-w-[85%] md:max-w-[70%] px-5 py-4 rounded-2xl text-sm md:text-base leading-relaxed shadow-sm",
+          "max-w-[90%] md:max-w-[70%] px-5 py-4 rounded-2xl text-sm md:text-base leading-relaxed shadow-sm",
           isCoach 
             ? "bg-muted/30 border border-border/50 text-foreground" 
             : "bg-primary text-primary-foreground border border-primary/20"
@@ -164,24 +164,7 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
             {content}
           </ReactMarkdown>
         ) : (
-          <div className="flex flex-col">
-            <span>{content}</span>
-            <div className="flex justify-end mt-2 pt-2 border-t border-primary-foreground/10">
-              <button
-                onClick={copyMessage}
-                className="flex items-center gap-1.5 text-primary-foreground/60 hover:text-primary-foreground transition-colors group"
-              >
-                {copied ? (
-                  <Check className="w-3 h-3" />
-                ) : (
-                  <Copy className="w-3 h-3 group-hover:scale-110 transition-transform" />
-                )}
-                <span className="text-[9px] font-bold uppercase tracking-widest">
-                  {copied ? "Copied" : "Copy"}
-                </span>
-              </button>
-            </div>
-          </div>
+          content
         )}
 
         {isCoach && isComplete && (
@@ -227,7 +210,7 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
       </div>
 
       {!isCoach && (
-        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center shrink-0 mt-1 border border-border/50">
+        <div className="hidden md:flex w-8 h-8 rounded-full bg-muted items-center justify-center shrink-0 mt-1 border border-border/50">
           <User className="w-4 h-4 text-muted-foreground" />
         </div>
       )}
