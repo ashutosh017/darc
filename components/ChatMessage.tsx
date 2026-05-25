@@ -81,15 +81,15 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
         isCoach ? "justify-start" : "justify-end"
       )}
     >
-      {isCoach && (
-        <div className="hidden md:flex w-8 h-8 rounded-full bg-primary items-center justify-center shrink-0 mt-1 shadow-lg shadow-primary/20">
+      {/* {isCoach && (
+        <div className="hidden md:flex w-8 h-8 rounded-full bg-primary items-center justify-center shrink-0 mt-1 border border-primary/20">
           <Heart className="w-4 h-4 text-primary-foreground" />
         </div>
-      )}
+      )} */}
       
       <div
         className={cn(
-          "max-w-[90%] md:max-w-[70%] px-5 py-4 rounded-2xl text-sm md:text-base leading-relaxed shadow-sm",
+          "max-w-full px-5 py-4 rounded-2xl text-sm md:text-base leading-relaxed",
           isCoach 
             ? "bg-muted/30 border border-border/50 text-foreground" 
             : "bg-primary text-primary-foreground border border-primary/20"

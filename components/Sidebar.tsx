@@ -122,7 +122,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       {!isMobile && (
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full glass-panel flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors border border-border shadow-lg"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full glass-panel flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors border border-border"
         >
           {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
         </button>

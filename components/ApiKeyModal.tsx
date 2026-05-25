@@ -45,7 +45,7 @@ export function ApiKeyModal({ isOpen, onSave, onClose, initialValue = "" }: ApiK
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md glass-panel rounded-3xl p-8 shadow-2xl border border-white/10"
+            className="relative w-full max-w-md glass-panel rounded-3xl p-8 border border-white/10"
           >
             {/* Close Button - Only visible if we have a key or onClose is explicitly allowed */}
             {onClose && initialValue && (
@@ -58,7 +58,7 @@ export function ApiKeyModal({ isOpen, onSave, onClose, initialValue = "" }: ApiK
             )}
 
             <div className="flex flex-col items-center text-center mb-8">
-              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4 shadow-lg shadow-primary/20">
+              <div className="w-16 h-16 rounded-2xl bg-primary flex items-center justify-center mb-4 border border-primary/20">
                 <Key className="w-8 h-8 text-primary-foreground" />
               </div>
               <h2 className="text-2xl font-bold tracking-tight mb-2">Connect your Gemini API Key</h2>
@@ -78,7 +78,7 @@ export function ApiKeyModal({ isOpen, onSave, onClose, initialValue = "" }: ApiK
                     value={key}
                     onChange={(e) => setKey(e.target.value)}
                     placeholder="paste your key here..."
-                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
+                    className="w-full bg-zinc-900/50 border border-zinc-800 rounded-xl py-3 px-4 pr-12 focus:outline-none focus:ring-1 focus:ring-primary/50 transition-all placeholder:text-zinc-600"
                   />
                   <button
                     type="button"
@@ -104,7 +104,7 @@ export function ApiKeyModal({ isOpen, onSave, onClose, initialValue = "" }: ApiK
               <button
                 onClick={handleSave}
                 disabled={!key.trim()}
-                className="w-full bg-primary text-primary-foreground font-bold py-4 rounded-xl shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
+                className="w-full bg-primary text-primary-foreground font-bold py-4 rounded-xl border border-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 disabled:cursor-not-allowed"
               >
                 Save Key & Start Coaching
               </button>

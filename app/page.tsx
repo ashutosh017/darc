@@ -185,7 +185,7 @@ export default function ChatPage() {
       <div className="absolute top-6 right-6 z-30 hidden md:block">
         <button
           onClick={() => setIsKeyModalOpen(true)}
-          className="p-2.5 rounded-xl glass-panel text-muted-foreground hover:text-primary hover:border-primary/50 transition-all shadow-lg active:scale-95 group"
+          className="p-2.5 rounded-xl glass-panel text-muted-foreground hover:text-primary hover:border-primary/50 transition-all active:scale-95 group"
           title="Update API Key"
         >
           <Key className="w-5 h-5 group-hover:rotate-12 transition-transform" />
@@ -198,7 +198,7 @@ export default function ChatPage() {
           ref={scrollRef}
           className="h-full overflow-y-auto scrollbar-hide px-4 md:px-0"
         >
-          <div className="max-w-4xl mx-auto py-20 md:py-24">
+          <div className="max-w-4xl mx-auto pt-8 pb-20 md:py-24">
             <AnimatePresence mode="popLayout">
               {messages.length === 0 ? (
                 <ChatHero key="hero" onPromptClick={handleSendMessage} />
@@ -232,9 +232,6 @@ export default function ChatPage() {
             </AnimatePresence>
           </div>
         </div>
-        
-        <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-background to-transparent pointer-events-none z-10" />
-        <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-background to-transparent pointer-events-none z-10" />
       </div>
 
       {/* Input Area */}
