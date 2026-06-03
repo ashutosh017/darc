@@ -1,27 +1,75 @@
-import { GoogleGenAI } from "@google/genai";
+"use server";
 
-const ai = new GoogleGenAI({
-    apiKey:process.env.GEMINI_API_KEY
-});
-const chat = ai.chats.create({ model: "gemini-3.5-flash" });
+import { db } from "@/lib/db";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { Role } from "@prisma/client";
 
-async function main() {
-  
-
-  let response = await chat.sendMessage({ message: "I have 2 dogs in my house." });
-  console.log("Response 1:", response.text);
-
-  response = await chat.sendMessage({ message: "How many paws are in my house?" });
-  console.log("Response 2:", response.text);
-  
-  const chat2 = ai.chats.create({model:'gemini-3.5-flash'})
-
-  response = await chat2.sendMessage({ message: "How many paws are in my house?" });
-  console.log("Response 3:", response.text);
+export async function getSession() {
+    return await auth.api.getSession({
+        headers: await headers(),
+    });
 }
 
-main();
+export async function createChat(title?: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
 
-export async function getStreamedResponse(input: string){
+    return await db.chat.create({
+        data: {
+            title: title || "New Chat",
+            user_id: session.user.id,
+        },
+    });
+}
 
+export async function saveMessage(chatId: string, text: string, role: Role) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    // Verify chat ownership
+    const chat = await db.chat.findUnique({
+        where: { id: chatId, user_id: session.user.id },
+    });
+    if (!chat) throw new Error("Chat not found");
+
+    return await db.message.create({
+        data: {
+            text,
+            role,
+            chat_id: chatId,
+        },
+    });
+}
+
+export async function getChatMessages(chatId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    return await db.message.findMany({
+        where: { 
+            chat_id: chatId,
+            chat: { user_id: session.user.id }
+        },
+        orderBy: { createdAt: "asc" },
+    });
+}
+
+export async function getUserChats() {
+    const session = await getSession();
+    if (!session) return [];
+
+    return await db.chat.findMany({
+        where: { user_id: session.user.id },
+        orderBy: { createdAt: "desc" },
+    });
+}
+
+export async function deleteChat(chatId: string) {
+    const session = await getSession();
+    if (!session) throw new Error("Unauthorized");
+
+    return await db.chat.delete({
+        where: { id: chatId, user_id: session.user.id },
+    });
 }

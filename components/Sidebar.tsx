@@ -5,14 +5,18 @@ import { cn } from "@/lib/utils";
 import { 
   Heart, 
   MessageSquarePlus, 
-  History, 
-  Settings, 
   ChevronLeft, 
   ChevronRight,
   User,
-  X
+  X,
+  LogOut,
+  LogIn,
+  MessageSquare,
+  Settings
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { useSession, signIn, signOut } from "@/lib/auth-client";
+import { useChat } from "@/lib/chat-context";
 
 interface SidebarItemProps {
   icon: React.ElementType;
@@ -20,16 +24,18 @@ interface SidebarItemProps {
   active?: boolean;
   collapsed?: boolean;
   onClick?: () => void;
+  className?: string;
 }
 
-const SidebarItem = ({ icon: Icon, label, active, collapsed, onClick }: SidebarItemProps) => (
+const SidebarItem = ({ icon: Icon, label, active, collapsed, onClick, className }: SidebarItemProps) => (
   <button
     onClick={onClick}
     className={cn(
       "flex items-center w-full gap-3 px-3 py-2 rounded-lg transition-all duration-200 group",
       active 
         ? "bg-primary text-primary-foreground" 
-        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
+      className
     )}
   >
     <Icon className="w-5 h-5 shrink-0" />
@@ -49,6 +55,19 @@ interface SidebarProps {
 export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeTab, setActiveTab] = useState("new");
+  const { data: session, isPending } = useSession();
+  const { chats, currentChatId, setCurrentChatId, isLoadingChats } = useChat();
+
+  const handleAuth = async () => {
+    if (session) {
+      await signOut();
+    } else {
+      await signIn.social({
+        provider: "google",
+        callbackURL: "/",
+      });
+    }
+  };
 
   const sidebarContent = (
     <>
@@ -75,48 +94,102 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
         )}
       </div>
 
-      <nav className="flex-1 flex flex-col gap-2">
+      <nav className="flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-hide">
         <SidebarItem 
           icon={MessageSquarePlus} 
           label="New Session" 
-          active={activeTab === "new"}
+          active={!currentChatId && activeTab === "new"}
           collapsed={isCollapsed}
           onClick={() => {
+            setCurrentChatId(null);
             setActiveTab("new");
             if (isMobile) onClose?.();
           }}
         />
-        <SidebarItem 
-          icon={History} 
-          label="History" 
-          active={activeTab === "history"}
-          collapsed={isCollapsed}
-          onClick={() => {
-            setActiveTab("history");
-            if (isMobile) onClose?.();
-          }}
-        />
-        <SidebarItem 
-          icon={Settings} 
-          label="Coach Settings" 
-          active={activeTab === "settings"}
-          collapsed={isCollapsed}
-          onClick={() => {
-            setActiveTab("settings");
-            if (isMobile) onClose?.();
-          }}
-        />
+        
+        {!isCollapsed && chats.length > 0 && (
+          <div className="mt-4 mb-2 px-3">
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
+              Recent Chats
+            </span>
+          </div>
+        )}
+
+        <div className="flex flex-col gap-1">
+          {chats.map((chat) => (
+            <SidebarItem
+              key={chat.id}
+              icon={MessageSquare}
+              label={chat.title || "Untitled Chat"}
+              active={currentChatId === chat.id}
+              collapsed={isCollapsed}
+              onClick={() => {
+                setCurrentChatId(chat.id);
+                setActiveTab("history");
+                if (isMobile) onClose?.();
+              }}
+            />
+          ))}
+          {isLoadingChats && !isCollapsed && (
+            <div className="px-3 py-2 text-xs text-muted-foreground animate-pulse">
+              Loading history...
+            </div>
+          )}
+        </div>
+
+        <div className="mt-4">
+          <SidebarItem 
+            icon={Settings} 
+            label="Coach Settings" 
+            active={activeTab === "settings"}
+            collapsed={isCollapsed}
+            onClick={() => {
+              setActiveTab("settings");
+              if (isMobile) onClose?.();
+            }}
+          />
+        </div>
       </nav>
 
-      <div className="mt-auto pt-4 border-t border-border/50">
-        <SidebarItem 
-          icon={User} 
-          label="Profile" 
-          collapsed={isCollapsed}
-          onClick={() => {
-            if (isMobile) onClose?.();
-          }}
-        />
+      <div className="mt-auto pt-4 border-t border-border/50 flex flex-col gap-2">
+        {session ? (
+          <>
+            <div className={cn(
+              "flex items-center gap-3 px-3 py-2",
+              isCollapsed && "justify-center"
+            )}>
+              {session.user.image ? (
+                <img 
+                  src={session.user.image} 
+                  alt={session.user.name} 
+                  className="w-6 h-6 rounded-full"
+                />
+              ) : (
+                <User className="w-5 h-5 text-muted-foreground" />
+              )}
+              {!isCollapsed && (
+                <div className="flex flex-col min-w-0">
+                  <span className="text-sm font-medium truncate">{session.user.name}</span>
+                  <span className="text-xs text-muted-foreground truncate">{session.user.email}</span>
+                </div>
+              )}
+            </div>
+            <SidebarItem 
+              icon={LogOut} 
+              label="Sign Out" 
+              collapsed={isCollapsed}
+              onClick={handleAuth}
+              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
+            />
+          </>
+        ) : (
+          <SidebarItem 
+            icon={LogIn} 
+            label={isPending ? "Loading..." : "Sign In"} 
+            collapsed={isCollapsed}
+            onClick={handleAuth}
+          />
+        )}
       </div>
 
       {!isMobile && (
