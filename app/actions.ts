@@ -51,7 +51,7 @@ export async function getChatMessages(chatId: string) {
             chat_id: chatId,
             chat: { user_id: session.user.id }
         },
-        orderBy: { createdAt: "asc" },
+        orderBy: { created_at: "asc" },
     });
 }
 
@@ -61,7 +61,7 @@ export async function getUserChats() {
 
     return await db.chat.findMany({
         where: { user_id: session.user.id },
-        orderBy: { createdAt: "desc" },
+        orderBy: { created_at: "desc" },
     });
 }
 

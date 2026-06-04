@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "migrate:prod": "dotenv -e .env.production -- bunx prisma migrate deploy",
+    "reset:prod": "dotenv -e .env.production -- bunx prisma reset",
+    "postinstall": "bunx prisma generate"
   },
   "dependencies": {
     "@better-auth/kysely-adapter": "^1.6.13",
@@ -19,6 +22,7 @@
     "better-auth": "^1.6.13",
     "clsx": "^2.1.1",
     "dotenv": "^17.4.2",
+    "dotenv-cli": "^11.0.0",
     "framer-motion": "^12.40.0",
     "kysely": "^0.28.17",
     "lucide-react": "^1.16.0",
