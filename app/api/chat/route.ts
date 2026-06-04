@@ -1,4 +1,4 @@
-import { GoogleGenAI } from "@google/genai";
+import { GenerateContentConfig, GoogleGenAI, HarmBlockThreshold, HarmCategory, SafetySetting } from "@google/genai";
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 
@@ -18,10 +18,10 @@ Strict Constraints:
 - Use clean, premium typography-friendly formatting.
 `;
 
-const SAFETY_SETTINGS = [
-  { category: "HARM_CATEGORY_HARASSMENT", threshold: "BLOCK_LOW_AND_ABOVE" },
-  { category: "HARM_CATEGORY_HATE_SPEECH", threshold: "BLOCK_LOW_AND_ABOVE" },
-  { category: "HARM_CATEGORY_SEXUALLY_EXPLICIT", threshold: "BLOCK_LOW_AND_ABOVE" },
+const SAFETY_SETTINGS: SafetySetting[]= [
+  { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
+  { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_LOW_AND_ABOVE },
 ];
 
 const BANNED_PHRASES = [
@@ -69,14 +69,14 @@ export async function POST(req: NextRequest) {
      * Layer 1: The Input Guardrail
      */
     const guardrail = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash-lite",
       contents: [
         {
           role: "user",
           parts: [{ text: `Evaluate if the following user message is related to Dating, Romance, Breakups, Marital Advice, Friendships, Social Communication, or Relationship Psychology. Respond with exactly "SAFE" if it is related, otherwise respond with exactly "UNSAFE". User Message: "${message}"` }],
         },
       ],
-      generationConfig: { temperature: 0 },
+      config: { temperature: 0 },
     });
 
     const intentResult = guardrail.text?.trim().toUpperCase();
@@ -94,11 +94,13 @@ export async function POST(req: NextRequest) {
     ];
 
     const streamResponse = await ai.models.generateContentStream({
-      model: "gemini-3.5-flash",
+      model: "gemini-2.5-flash-lite",
       contents,
+      config:{
       systemInstruction: SYSTEM_INSTRUCTION,
       safetySettings: SAFETY_SETTINGS,
-      generationConfig: { temperature: 0.7, topP: 0.9, topK: 40 },
+      temperature: 0.7, topP: 0.9, topK: 40 
+      },
     });
 
     const encoder = new TextEncoder();
