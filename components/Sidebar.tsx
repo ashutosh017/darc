@@ -3,49 +3,19 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { 
-  Heart, 
-  MessageSquarePlus, 
-  ChevronLeft, 
-  ChevronRight,
+  Plus, 
+  Menu,
   User,
   X,
   LogOut,
   LogIn,
   MessageSquare,
-  Settings
+  Settings,
+  MoreVertical,
 } from "lucide-react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
 import { useChat } from "@/lib/chat-context";
-
-interface SidebarItemProps {
-  icon: React.ElementType;
-  label: string;
-  active?: boolean;
-  collapsed?: boolean;
-  onClick?: () => void;
-  className?: string;
-}
-
-const SidebarItem = ({ icon: Icon, label, active, collapsed, onClick, className }: SidebarItemProps) => (
-  <button
-    onClick={onClick}
-    className={cn(
-      "flex items-center w-full gap-3 px-3 py-2 rounded-lg transition-all duration-200 group",
-      active 
-        ? "bg-primary text-primary-foreground" 
-        : "text-muted-foreground hover:bg-accent hover:text-accent-foreground",
-      className
-    )}
-  >
-    <Icon className="w-5 h-5 shrink-0" />
-    {!collapsed && (
-      <span className="text-sm font-medium whitespace-nowrap overflow-hidden text-ellipsis">
-        {label}
-      </span>
-    )}
-  </button>
-);
 
 interface SidebarProps {
   isMobile?: boolean;
@@ -54,7 +24,6 @@ interface SidebarProps {
 
 export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const [activeTab, setActiveTab] = useState("new");
   const { data: session, isPending } = useSession();
   const { chats, currentChatId, setCurrentChatId, isLoadingChats } = useChat();
 
@@ -70,92 +39,109 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   };
 
   const sidebarContent = (
-    <>
+    <div className="flex flex-col h-full text-[#e3e3e3]">
+      {/* Header & Hamburger */}
       <div className={cn(
-        "flex items-center mb-8",
-        isCollapsed ? "justify-center mt-4" : "gap-3 px-2 justify-between"
+        "flex items-center h-16 px-4 shrink-0",
+        isCollapsed ? "justify-center" : "justify-between"
       )}>
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <Heart className="w-5 h-5 text-primary-foreground" />
-          </div>
-          {!isCollapsed && (
-            <span className="text-xl font-bold tracking-tighter">DARC</span>
-          )}
-        </div>
-        
+        <button 
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="p-2 hover:bg-[#282a2c] rounded-full transition-colors text-[#b4b4b4] hover:text-[#e3e3e3]"
+        >
+          <Menu size={24} />
+        </button>
+        {!isCollapsed && !isMobile && (
+          <span className="text-xl font-medium tracking-tight ml-2 flex-1">DARC</span>
+        )}
         {isMobile && (
           <button 
             onClick={onClose}
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
+            className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3]"
           >
-            <X size={20} />
+            <X size={24} />
           </button>
         )}
       </div>
 
-      <nav className="flex-1 flex flex-col gap-2 overflow-y-auto scrollbar-hide">
-        <SidebarItem 
-          icon={MessageSquarePlus} 
-          label="New Session" 
-          active={!currentChatId && activeTab === "new"}
-          collapsed={isCollapsed}
+      {/* New Chat Button */}
+      <div className={cn(
+        "px-4 py-2 mb-4",
+        isCollapsed ? "flex justify-center" : ""
+      )}>
+        <button
           onClick={() => {
             setCurrentChatId(null);
-            setActiveTab("new");
             if (isMobile) onClose?.();
           }}
-        />
-        
-        {!isCollapsed && chats.length > 0 && (
-          <div className="mt-4 mb-2 px-3">
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/50">
-              Recent Chats
-            </span>
+          className={cn(
+            "flex items-center gap-3 h-10 transition-all duration-200 shadow-sm",
+            isCollapsed 
+              ? "w-10 justify-center rounded-full bg-[#1a1a1c] hover:bg-[#282a2c]" 
+              : "px-4 rounded-full bg-[#1a1a1c] hover:bg-[#282a2c] min-w-[120px]"
+          )}
+        >
+          <Plus size={20} className="text-[#e3e3e3]" />
+          {!isCollapsed && <span className="text-sm font-medium">New Chat</span>}
+        </button>
+      </div>
+
+      {/* History List */}
+      <div className="flex-1 overflow-y-auto scrollbar-hide px-3 space-y-1">
+        {!isCollapsed && (
+          <div className="px-3 py-2">
+            <span className="text-xs font-medium text-[#b4b4b4]">Recent</span>
           </div>
         )}
-
-        <div className="flex flex-col gap-1">
-          {chats.map((chat) => (
-            <SidebarItem
-              key={chat.id}
-              icon={MessageSquare}
-              label={chat.title || "Untitled Chat"}
-              active={currentChatId === chat.id}
-              collapsed={isCollapsed}
-              onClick={() => {
-                setCurrentChatId(chat.id);
-                setActiveTab("history");
-                if (isMobile) onClose?.();
-              }}
-            />
-          ))}
-          {isLoadingChats && !isCollapsed && (
-            <div className="px-3 py-2 text-xs text-muted-foreground animate-pulse">
-              Loading history...
-            </div>
-          )}
-        </div>
-
-        <div className="mt-4">
-          <SidebarItem 
-            icon={Settings} 
-            label="Coach Settings" 
-            active={activeTab === "settings"}
-            collapsed={isCollapsed}
+        
+        {chats.map((chat) => (
+          <button
+            key={chat.id}
             onClick={() => {
-              setActiveTab("settings");
+              setCurrentChatId(chat.id);
               if (isMobile) onClose?.();
             }}
-          />
-        </div>
-      </nav>
+            className={cn(
+              "flex items-center w-full gap-3 px-3 py-2.5 rounded-full transition-all duration-200 group relative",
+              currentChatId === chat.id 
+                ? "bg-[#000000/20] text-[#e3e3e3]" 
+                : "text-[#e3e3e3] hover:bg-[#282a2c]"
+            )}
+          >
+            <MessageSquare size={18} className="shrink-0 text-[#b4b4b4] group-hover:text-[#e3e3e3]" />
+            {!isCollapsed && (
+              <span className="text-sm truncate pr-6">
+                {chat.title || "Untitled Chat"}
+              </span>
+            )}
+            {!isCollapsed && currentChatId === chat.id && (
+              <MoreVertical size={14} className="absolute right-3 text-[#b4b4b4]" />
+            )}
+          </button>
+        ))}
 
-      <div className="mt-auto pt-4 border-t border-border/50 flex flex-col gap-2">
+        {isLoadingChats && !isCollapsed && (
+          <div className="px-6 py-2 text-xs text-[#b4b4b4] animate-pulse">
+            Loading...
+          </div>
+        )}
+      </div>
+
+      {/* Bottom Controls */}
+      <div className="mt-auto p-3 border-t border-[#3c4043]/30">
         {session ? (
-          <>
+          <div className="flex flex-col gap-1">
+            <button
+              className={cn(
+                "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-[#e3e3e3] hover:bg-[#282a2c] transition-colors",
+                isCollapsed && "justify-center"
+              )}
+            >
+              <Settings size={18} className="text-[#b4b4b4]" />
+              {!isCollapsed && <span className="text-sm">Settings</span>}
+            </button>
             <div className={cn(
-              "flex items-center gap-3 px-3 py-2",
+              "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-[#282a2c] cursor-pointer transition-colors mt-1",
               isCollapsed && "justify-center"
             )}>
               {session.user.image ? (
@@ -165,47 +151,39 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                   className="w-6 h-6 rounded-full"
                 />
               ) : (
-                <User className="w-5 h-5 text-muted-foreground" />
+                <User size={18} className="text-[#b4b4b4]" />
               )}
               {!isCollapsed && (
-                <div className="flex flex-col min-w-0">
+                <div className="flex flex-col min-w-0 flex-1">
                   <span className="text-sm font-medium truncate">{session.user.name}</span>
-                  <span className="text-xs text-muted-foreground truncate">{session.user.email}</span>
                 </div>
               )}
+              {!isCollapsed && (
+                <button onClick={handleAuth} title="Sign Out">
+                  <LogOut size={16} className="text-[#b4b4b4] hover:text-[#f28b82]" />
+                </button>
+              )}
             </div>
-            <SidebarItem 
-              icon={LogOut} 
-              label="Sign Out" 
-              collapsed={isCollapsed}
-              onClick={handleAuth}
-              className="text-destructive hover:bg-destructive/10 hover:text-destructive"
-            />
-          </>
+          </div>
         ) : (
-          <SidebarItem 
-            icon={LogIn} 
-            label={isPending ? "Loading..." : "Sign In"} 
-            collapsed={isCollapsed}
+          <button 
             onClick={handleAuth}
-          />
+            className={cn(
+              "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-[#e3e3e3] hover:bg-[#282a2c] transition-colors",
+              isCollapsed && "justify-center"
+            )}
+          >
+            <LogIn size={18} className="text-[#b4b4b4]" />
+            {!isCollapsed && <span className="text-sm font-medium">{isPending ? "Loading..." : "Sign In"}</span>}
+          </button>
         )}
       </div>
-
-      {!isMobile && (
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 rounded-full glass-panel flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-colors border border-border"
-        >
-          {isCollapsed ? <ChevronRight size={14} /> : <ChevronLeft size={14} />}
-        </button>
-      )}
-    </>
+    </div>
   );
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-full p-4">
+      <div className="flex flex-col h-full bg-[#1e1f20]">
         {sidebarContent}
       </div>
     );
@@ -214,11 +192,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   return (
     <motion.aside
       initial={false}
-      animate={{ width: isCollapsed ? "80px" : "260px" }}
-      className={cn(
-        "h-screen glass-panel hidden md:flex flex-col transition-all duration-300 ease-in-out relative z-30",
-        isCollapsed ? "items-center" : "p-4"
-      )}
+      animate={{ width: isCollapsed ? "68px" : "280px" }}
+      transition={{ duration: 0.2, ease: "easeInOut" }}
+      className="h-screen bg-[#1e1f20] hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
     >
       {sidebarContent}
     </motion.aside>

@@ -2,38 +2,27 @@
 
 import React, { useState } from "react";
 import { Sidebar } from "./Sidebar";
-import { Menu, Heart, Key } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
-export function MobileHeader({ onKeyClick }: { onKeyClick?: () => void }) {
+export function MobileHeader() {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
-      <header className="md:hidden flex items-center justify-between px-4 py-3 glass-panel border-b border-border/50 sticky top-0 z-40">
+      <header className="md:hidden flex items-center justify-between px-4 h-16 bg-[#131314] border-b border-[#3c4043]/30 sticky top-0 z-40">
+        <button
+          onClick={() => setIsOpen(true)}
+          className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3] transition-colors"
+        >
+          <Menu size={24} />
+        </button>
+        
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-            <Heart className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <span className="text-lg font-bold tracking-tighter">DARC</span>
+          <span className="text-xl font-medium tracking-tight text-[#e3e3e3]">DARC</span>
         </div>
         
-        <div className="flex items-center gap-1">
-          {onKeyClick && (
-            <button
-              onClick={onKeyClick}
-              className="p-2 text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Key size={20} />
-            </button>
-          )}
-          <button
-            onClick={() => setIsOpen(true)}
-            className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <Menu size={24} />
-          </button>
-        </div>
+        <div className="w-10" /> {/* Spacer for centering logo */}
       </header>
 
       <AnimatePresence>
@@ -45,7 +34,7 @@ export function MobileHeader({ onKeyClick }: { onKeyClick?: () => void }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsOpen(false)}
-              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 md:hidden"
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 md:hidden"
             />
             
             {/* Drawer */}
@@ -53,8 +42,8 @@ export function MobileHeader({ onKeyClick }: { onKeyClick?: () => void }) {
               initial={{ x: "-100%" }}
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed inset-y-0 left-0 w-[280px] glass-panel z-50 md:hidden border-r border-border/50"
+              transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
+              className="fixed inset-y-0 left-0 w-[280px] bg-[#1e1f20] z-50 md:hidden border-r border-[#3c4043]/30 shadow-2xl"
             >
               <Sidebar isMobile onClose={() => setIsOpen(false)} />
             </motion.div>

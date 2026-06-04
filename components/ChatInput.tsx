@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, Mic, Image as ImageIcon, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface ChatInputProps {
@@ -30,43 +30,51 @@ export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = `${Math.min(textareaRef.current.scrollHeight, 200)}px`;
     }
   }, [message]);
 
   return (
-    <div className="w-full max-w-4xl mx-auto p-4 md:p-6">
-      <div className="relative flex glass-panel rounded-2xl p-1 input-glow transition-all duration-300">
-        <textarea
-          ref={textareaRef}
-          rows={1}
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="Ask DARC about your relationship..."
-          disabled={disabled}
-          className="w-full bg-transparent border-none focus:ring-0 text-foreground resize-none py-3 px-4 max-h-[200px] overflow-y-auto scrollbar-hide text-sm md:text-base leading-relaxed placeholder:text-muted-foreground/50"
-        />
-        <div className="flex items-center justify-between px-3 pb-2 pt-1">
-          {/* <div className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium">
-            {message.length} characters
-          </div> */}
-          <button
-            onClick={handleSend}
-            disabled={!message.trim() || disabled}
-            className={cn(
-              "p-2 rounded-xl transition-all duration-300",
-              message.trim() && !disabled
-                ? "bg-primary text-primary-foreground hover:scale-105 active:scale-95"
-                : "bg-muted text-muted-foreground cursor-not-allowed"
-            )}
-          >
-            <ArrowUp className="w-4 h-4" />
-          </button>
+    <div className="w-full max-w-3xl mx-auto px-4 pb-4">
+      <div className="relative flex flex-col bg-[#1e1f20] rounded-[32px] p-2 transition-all duration-300 shadow-lg border border-transparent focus-within:border-[#3c4043]">
+        <div className="flex items-end gap-2 px-2">
+          {/* Optional: Add a plus or upload button like Gemini */}
+          {/* <button className="p-3 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors mb-1">
+            <Plus size={20} />
+          </button> */}
+          
+          <textarea
+            ref={textareaRef}
+            rows={1}
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="Ask DARC..."
+            disabled={disabled}
+            className="w-full bg-transparent border-none focus:ring-0 text-[#e3e3e3] resize-none py-3 px-4 max-h-[200px] overflow-y-auto scrollbar-hide text-[16px] leading-relaxed placeholder:text-[#b4b4b4]"
+          />
+          
+          <div className="flex items-center gap-1 mb-1.5">
+            {/* <button className="p-3 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors">
+              <Mic size={20} />
+            </button> */}
+            <button
+              onClick={handleSend}
+              disabled={!message.trim() || disabled}
+              className={cn(
+                "p-3 rounded-full transition-all duration-300",
+                message.trim() && !disabled
+                  ? "bg-[#e3e3e3] text-[#131314] hover:bg-white scale-100"
+                  : "bg-transparent text-[#3c4043] cursor-not-allowed"
+              )}
+            >
+              <ArrowUp size={20} />
+            </button>
+          </div>
         </div>
       </div>
-      <p className="hidden md:block text-center text-[10px] text-muted-foreground/40 mt-3 font-medium tracking-tight">
-        DARC provides AI-driven relationship coaching. Please consider professional therapy for complex emotional needs.
+      <p className="text-center text-[11px] text-[#b4b4b4] mt-3 px-4">
+        DARC may display inaccurate info, so double-check its coaching insights.
       </p>
     </div>
   );

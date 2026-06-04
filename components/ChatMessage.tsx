@@ -3,8 +3,9 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Heart, User, Copy, Check, ThumbsUp, ThumbsDown } from "lucide-react";
+import { User, Copy, Check, ThumbsUp, ThumbsDown } from "lucide-react";
 import ReactMarkdown from "react-markdown";
+import { useSession } from "@/lib/auth-client";
 
 interface ChatMessageProps {
   role: "user" | "coach";
@@ -26,30 +27,28 @@ const CodeBlock = ({ language, value }: { language: string; value: string }) => 
   };
 
   return (
-    <div className="my-4 overflow-hidden rounded-lg border border-zinc-800 bg-zinc-950/80 shadow-2xl font-mono text-sm">
-      <div className="flex items-center justify-between px-4 py-2 bg-zinc-900/50 border-b border-zinc-800/50">
-        <span className="text-[11px] uppercase tracking-widest font-bold text-zinc-500">
+    <div className="my-6 overflow-hidden rounded-2xl border border-[#3c4043]/30 bg-[#1e1f20] shadow-sm font-mono text-[13px] md:text-[14px]">
+      <div className="flex items-center justify-between px-5 py-2.5 bg-[#1a1a1c] border-b border-[#3c4043]/30">
+        <span className="text-[11px] uppercase tracking-wider font-semibold text-[#b4b4b4]">
           {language || "code"}
         </span>
         <button
           onClick={copyToClipboard}
-          className="flex items-center gap-1.5 text-[11px] font-bold text-zinc-500 hover:text-zinc-300 transition-colors uppercase tracking-widest group"
+          className="flex items-center gap-2 text-[11px] font-semibold text-[#b4b4b4] hover:text-[#e3e3e3] transition-colors group"
         >
           {copied ? (
-            <>
-              <Check className="w-3 h-3 text-emerald-500" />
-              <span className="text-emerald-500">Copied</span>
-            </>
+            <span className="text-[#8ab4f8] flex items-center gap-1.5">
+              <Check size={12} /> Copied
+            </span>
           ) : (
-            <>
-              <Copy className="w-3 h-3 group-hover:scale-110 transition-transform" />
-              <span>Copy</span>
-            </>
+            <span className="flex items-center gap-1.5">
+              <Copy size={12} className="group-hover:scale-110 transition-transform" /> Copy
+            </span>
           )}
         </button>
       </div>
-      <div className="p-4 overflow-x-auto text-zinc-200 text-[13px] leading-6 selection:bg-purple-500/30 scrollbar-hide">
-        <code>{value}</code>
+      <div className="p-5 overflow-x-auto text-[#e3e3e3] leading-[1.6] scrollbar-hide">
+        <code className="block">{value}</code>
       </div>
     </div>
   );
@@ -57,6 +56,7 @@ const CodeBlock = ({ language, value }: { language: string; value: string }) => 
 
 export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
   const isCoach = role === "coach";
+  const { data: session } = useSession();
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
 
@@ -68,152 +68,154 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      transition={{ 
-        duration: 0.5, 
-        type: "spring", 
-        stiffness: 100, 
-        damping: 15 
-      }}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
       className={cn(
-        "flex w-full mb-8 gap-4",
-        isCoach ? "justify-start" : "justify-end"
+        "flex w-full mb-10 gap-4 md:gap-8",
+        isCoach ? "flex-row" : "flex-row-reverse"
       )}
     >
-      {/* {isCoach && (
-        <div className="hidden md:flex w-8 h-8 rounded-full bg-primary items-center justify-center shrink-0 mt-1 border border-primary/20">
-          <Heart className="w-4 h-4 text-primary-foreground" />
-        </div>
-      )} */}
-      
-      <div
-        className={cn(
-          "max-w-full px-5 py-4 rounded-2xl text-sm md:text-base leading-relaxed",
-          isCoach 
-            ? "bg-muted/30 border border-border/50 text-foreground" 
-            : "bg-primary text-primary-foreground border border-primary/20"
-        )}
-      >
+      {/* Avatar */}
+      <div className="shrink-0 pt-1 hidden md:flex">
         {isCoach ? (
-          <ReactMarkdown
-            components={{
-              p: ({ children }) => (
-                <p className="text-zinc-300 text-[15px] leading-relaxed mb-4 last:mb-0">
-                  {children}
-                </p>
-              ),
-              h1: ({ children }) => (
-                <h1 className="font-semibold text-zinc-100 mt-6 mb-2 tracking-tight text-xl">
-                  {children}
-                </h1>
-              ),
-              h2: ({ children }) => (
-                <h2 className="font-semibold text-zinc-100 mt-6 mb-2 tracking-tight text-lg">
-                  {children}
-                </h2>
-              ),
-              h3: ({ children }) => (
-                <h3 className="font-semibold text-zinc-100 mt-6 mb-2 tracking-tight text-base">
-                  {children}
-                </h3>
-              ),
-              ul: ({ children }) => (
-                <ul className="list-disc list-inside space-y-1.5 mb-4 text-zinc-300 pl-2">
-                  {children}
-                </ul>
-              ),
-              ol: ({ children }) => (
-                <ol className="list-decimal list-inside space-y-1.5 mb-4 text-zinc-300 pl-2">
-                  {children}
-                </ol>
-              ),
-              li: ({ children }) => (
-                <li className="inline-block w-full text-[15px] leading-relaxed">
-                  {children}
-                </li>
-              ),
-              blockquote: ({ children }) => (
-                <blockquote className="border-l-2 border-purple-500/50 bg-purple-950/10 px-4 py-3 my-4 rounded-r text-zinc-400 italic text-[14.5px]">
-                  {children}
-                </blockquote>
-              ),
-              code({ inline, className, children, ...props }: CodeProps) {
-                const match = /language-(\w+)/.exec(className || "");
-                const language = match ? match[1] : "";
-                const content = String(children).replace(/\n$/, "");
-
-                if (!inline && match) {
-                  return <CodeBlock language={language} value={content} />;
-                }
-
-                return (
-                  <code
-                    className={cn(
-                      "bg-zinc-800/80 text-purple-300 px-1.5 py-0.5 rounded text-[13px] font-mono border border-zinc-700/50",
-                      className
-                    )}
-                    {...props}
-                  >
-                    {children}
-                  </code>
-                );
-              },
-            }}
-          >
-            {content}
-          </ReactMarkdown>
+          <div className="w-9 h-9 rounded-full bg-[#1e1f20] flex items-center justify-center border border-[#3c4043]/30 shadow-sm">
+            <div className="w-5.5 h-5.5 rounded-full bg-gradient-to-tr from-[#4285f4] via-[#9b72cb] to-[#d96570] opacity-90 animate-shimmer bg-[length:200%_100%]" />
+          </div>
         ) : (
-          content
+          <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1f20] flex items-center justify-center border border-[#3c4043]/30 shadow-sm">
+            {session?.user.image ? (
+              <img src={session.user.image} alt="User" className="w-full h-full object-cover" />
+            ) : (
+              <User size={20} className="text-[#b4b4b4]" />
+            )}
+          </div>
         )}
+      </div>
+
+      {/* Content Area */}
+      <div className={cn(
+        "flex-1 max-w-full md:max-w-[calc(100%-3rem)] min-w-0",
+        !isCoach && "flex flex-col items-end"
+      )}>
+        <div className={cn(
+          "text-[16px] leading-[1.65] text-[#e3e3e3]",
+          isCoach ? "w-full" : "bg-[#1e1f20] px-6 py-3.5 rounded-[24px] inline-block max-w-full whitespace-pre-wrap shadow-sm"
+        )}>
+          {isCoach ? (
+            <ReactMarkdown
+              components={{
+                p: ({ children }) => (
+                  <p className="mb-5 last:mb-0 text-[#e3e3e3] font-normal">
+                    {children}
+                  </p>
+                ),
+                h1: ({ children }) => (
+                  <h1 className="text-[24px] font-semibold text-white mt-10 mb-5 tracking-tight">
+                    {children}
+                  </h1>
+                ),
+                h2: ({ children }) => (
+                  <h2 className="text-[20px] font-semibold text-white mt-9 mb-4 tracking-tight">
+                    {children}
+                  </h2>
+                ),
+                h3: ({ children }) => (
+                  <h3 className="text-[18px] font-semibold text-white mt-8 mb-3 tracking-tight">
+                    {children}
+                  </h3>
+                ),
+                ul: ({ children }) => (
+                  <ul className="list-disc list-outside space-y-2.5 mb-6 ml-6 text-[#e3e3e3]">
+                    {children}
+                  </ul>
+                ),
+                ol: ({ children }) => (
+                  <ol className="list-decimal list-outside space-y-2.5 mb-6 ml-6 text-[#e3e3e3]">
+                    {children}
+                  </ol>
+                ),
+                li: ({ children }) => (
+                  <li className="pl-1">
+                    {children}
+                  </li>
+                ),
+                strong: ({ children }) => (
+                  <strong className="font-semibold text-white">
+                    {children}
+                  </strong>
+                ),
+                blockquote: ({ children }) => (
+                  <blockquote className="border-l-[3px] border-[#8ab4f8] bg-[#1e1f20]/50 px-6 py-4 my-6 rounded-r-xl text-[#b4b4b4] italic font-medium">
+                    {children}
+                  </blockquote>
+                ),
+                code({ inline, className, children, ...props }: CodeProps) {
+                  const match = /language-(\w+)/.exec(className || "");
+                  const language = match ? match[1] : "";
+                  const content = String(children).replace(/\n$/, "");
+
+                  if (!inline && match) {
+                    return <CodeBlock language={language} value={content} />;
+                  }
+
+                  return (
+                    <code
+                      className={cn(
+                        "bg-[#282a2c] text-[#8ab4f8] px-1.5 py-0.5 rounded-md text-[14px] font-mono border border-[#3c4043]/30",
+                        className
+                      )}
+                      {...props}
+                    >
+                      {children}
+                    </code>
+                  );
+                },
+              }}
+            >
+              {content}
+            </ReactMarkdown>
+          ) : (
+            content
+          )}
+        </div>
 
         {isCoach && isComplete && (
           <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-3 mt-4 pt-4 border-t border-zinc-800/50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center gap-2 mt-5"
           >
             <button
               onClick={() => setFeedback(feedback === "up" ? null : "up")}
               className={cn(
-                "p-1.5 rounded-lg transition-colors",
-                feedback === "up" ? "text-emerald-500 bg-emerald-500/10" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
+                "p-2.5 rounded-full transition-colors hover:bg-[#282a2c]",
+                feedback === "up" ? "text-[#8ab4f8] bg-[#8ab4f8]/10" : "text-[#b4b4b4]"
               )}
+              title="Good response"
             >
-              <ThumbsUp className="w-4 h-4" />
+              <ThumbsUp size={16} />
             </button>
             <button
               onClick={() => setFeedback(feedback === "down" ? null : "down")}
               className={cn(
-                "p-1.5 rounded-lg transition-colors",
-                feedback === "down" ? "text-rose-500 bg-rose-500/10" : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800"
+                "p-2.5 rounded-full transition-colors hover:bg-[#282a2c]",
+                feedback === "down" ? "text-[#f28b82] bg-[#f28b82]/10" : "text-[#b4b4b4]"
               )}
+              title="Bad response"
             >
-              <ThumbsDown className="w-4 h-4" />
+              <ThumbsDown size={16} />
             </button>
-            <div className="w-px h-4 bg-zinc-800 mx-1" />
+            <div className="w-px h-4 bg-[#3c4043] mx-1.5" />
             <button
               onClick={copyMessage}
-              className="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition-colors group"
+              className="flex items-center gap-2 p-2.5 rounded-full text-[#b4b4b4] hover:bg-[#282a2c] transition-colors"
+              title="Copy response"
             >
-              {copied ? (
-                <Check className="w-4 h-4 text-emerald-500" />
-              ) : (
-                <Copy className="w-4 h-4 group-hover:scale-110 transition-transform" />
-              )}
-              <span className="text-[11px] font-bold uppercase tracking-widest">
-                {copied ? "Copied" : "Copy"}
-              </span>
+              {copied ? <Check size={16} className="text-[#8ab4f8]" /> : <Copy size={16} />}
             </button>
           </motion.div>
         )}
       </div>
-
-      {!isCoach && (
-        <div className="hidden md:flex w-8 h-8 rounded-full bg-muted items-center justify-center shrink-0 mt-1 border border-border/50">
-          <User className="w-4 h-4 text-muted-foreground" />
-        </div>
-      )}
     </motion.div>
   );
 }
