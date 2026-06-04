@@ -40,27 +40,28 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
 
   const sidebarContent = (
     <div className="flex flex-col h-full text-[#e3e3e3]">
-      {/* Header & Hamburger */}
+      {/* Header & Hamburger/Close */}
       <div className={cn(
         "flex items-center h-16 px-4 shrink-0",
         isCollapsed ? "justify-center" : "justify-between"
       )}>
-        <button 
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-2 hover:bg-[#282a2c] rounded-full transition-colors text-[#b4b4b4] hover:text-[#e3e3e3]"
-        >
-          <Menu size={24} />
-        </button>
-        {!isCollapsed && !isMobile && (
-          <span className="text-xl font-medium tracking-tight ml-2 flex-1">DARC</span>
-        )}
-        {isMobile && (
+        {isCollapsed ? (
           <button 
-            onClick={onClose}
-            className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3]"
+            onClick={() => setIsCollapsed(false)}
+            className="p-2 hover:bg-[#282a2c] rounded-full transition-colors text-[#b4b4b4] hover:text-[#e3e3e3]"
           >
-            <X size={24} />
+            <Menu size={24} />
           </button>
+        ) : (
+          <>
+            <span className="text-xl font-medium tracking-tight ml-2">DARC</span>
+            <button 
+              onClick={() => (isMobile ? onClose?.() : setIsCollapsed(true))}
+              className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors"
+            >
+              <X size={24} />
+            </button>
+          </>
         )}
       </div>
 
