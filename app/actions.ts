@@ -3,7 +3,7 @@
 import { db } from "@/lib/db";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
-import { Role } from "@prisma/client";
+import { Role } from "@/lib/generated/prisma";
 
 export async function getSession() {
     return await auth.api.getSession({
