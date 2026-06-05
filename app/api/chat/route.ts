@@ -69,7 +69,7 @@ export async function POST(req: NextRequest) {
      * Layer 1: The Input Guardrail
      */
     const guardrail = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.1-flash-lite",
       contents: [
         {
           role: "user",
@@ -94,7 +94,7 @@ export async function POST(req: NextRequest) {
     ];
 
     const streamResponse = await ai.models.generateContentStream({
-      model: "gemini-2.5-flash-lite",
+      model: "gemini-3.1-flash-lite",
       contents,
       config:{
       systemInstruction: SYSTEM_INSTRUCTION,

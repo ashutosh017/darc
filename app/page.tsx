@@ -87,17 +87,17 @@ export default function ChatPage() {
       setMessages((prev) => [...prev, userMessage]);
       setIsTyping(true);
 
-      const history = messages.map(m => ({
-        role: m.role === "USER" ? "user" : "model",
-        parts: [{ text: m.text }]
-      }));
+      // const history = messages.map(m => ({
+      //   role: m.role === "USER" ? "user" : "model",
+      //   parts: [{ text: m.text }]
+      // }));
 
       const response = await fetch("/api/chat", {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ message: content, history }),
+        body: JSON.stringify({ message: content }),
       });
 
       if (!response.ok) {
