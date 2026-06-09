@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { 
   Plus, 
@@ -12,10 +12,15 @@ import {
   MessageSquare,
   Settings,
   MoreVertical,
+  Share2,
+  Pencil,
+  Trash2,
 } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
 import { useChat } from "@/lib/chat-context";
+import { useRouter } from "next/navigation";
+import { deleteChat } from "@/app/actions";
 
 interface SidebarProps {
   isMobile?: boolean;
@@ -24,8 +29,35 @@ interface SidebarProps {
 
 export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [activeMenuChatId, setActiveMenuChatId] = useState<string | null>(null);
   const { data: session, isPending } = useSession();
-  const { chats, currentChatId, setCurrentChatId, isLoadingChats } = useChat();
+  const { chats, currentChatId, refreshChats, isLoadingChats } = useChat();
+  const router = useRouter();
+
+  // Close dropdown on click outside
+  useEffect(() => {
+    const handleOutsideClick = () => {
+      setActiveMenuChatId(null);
+    };
+    if (activeMenuChatId) {
+      document.addEventListener("click", handleOutsideClick);
+    }
+    return () => {
+      document.removeEventListener("click", handleOutsideClick);
+    };
+  }, [activeMenuChatId]);
+
+  const handleDeleteChat = async (chatId: string) => {
+    try {
+      await deleteChat(chatId);
+      await refreshChats();
+      if (currentChatId === chatId) {
+        router.push("/");
+      }
+    } catch (error) {
+      console.error("Failed to delete chat:", error);
+    }
+  };
 
   const handleAuth = async () => {
     if (session) {
@@ -72,7 +104,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       )}>
         <button
           onClick={() => {
-            setCurrentChatId(null);
+            router.push("/");
             if (isMobile) onClose?.();
           }}
           className={cn(
@@ -95,15 +127,16 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           </div>
         )}
         
-        {chats.map((chat) => (
-          <button
+        {chats.map((chat, index) => (
+          <div
             key={chat.id}
             onClick={() => {
-              setCurrentChatId(chat.id);
+              router.push(`/chat/${chat.id}`);
               if (isMobile) onClose?.();
             }}
+            title={chat.title || "Untitled Chat"}
             className={cn(
-              "flex items-center w-full gap-3 px-3 py-2.5 rounded-full transition-all duration-200 group relative",
+              "flex items-center w-full gap-3 px-3 py-2.5 rounded-full transition-all duration-200 group relative cursor-pointer",
               currentChatId === chat.id 
                 ? "bg-[#000000/20] text-[#e3e3e3]" 
                 : "text-[#e3e3e3] hover:bg-[#282a2c]"
@@ -111,14 +144,65 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           >
             <MessageSquare size={18} className="shrink-0 text-[#b4b4b4] group-hover:text-[#e3e3e3]" />
             {!isCollapsed && (
-              <span className="text-sm truncate pr-6">
+              <span className="text-sm truncate pr-8">
                 {chat.title || "Untitled Chat"}
               </span>
             )}
-            {!isCollapsed && currentChatId === chat.id && (
-              <MoreVertical size={14} className="absolute right-3 text-[#b4b4b4]" />
+            {!isCollapsed && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setActiveMenuChatId(activeMenuChatId === chat.id ? null : chat.id);
+                }}
+                className={cn(
+                  "absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors z-20",
+                  currentChatId === chat.id || activeMenuChatId === chat.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+                )}
+              >
+                <MoreVertical size={14} />
+              </button>
             )}
-          </button>
+
+            {/* Dropdown Menu */}
+            {!isCollapsed && activeMenuChatId === chat.id && (
+              <div className={cn(
+                "absolute right-3 z-50 bg-[#282a2c] border border-[#3c4043]/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
+                index < 3 ? "top-full mt-1" : "bottom-full mb-1"
+              )}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveMenuChatId(null);
+                  }}
+                  className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
+                >
+                  <Share2 size={14} className="text-[#b4b4b4]" />
+                  <span>Share</span>
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setActiveMenuChatId(null);
+                  }}
+                  className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
+                >
+                  <Pencil size={14} className="text-[#b4b4b4]" />
+                  <span>Rename</span>
+                </button>
+                <button
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    await handleDeleteChat(chat.id);
+                    setActiveMenuChatId(null);
+                  }}
+                  className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#f28b82] hover:bg-[#f28b82]/10 transition-colors"
+                >
+                  <Trash2 size={14} className="text-[#f28b82]" />
+                  <span>Delete</span>
+                </button>
+              </div>
+            )}
+          </div>
         ))}
 
         {isLoadingChats && !isCollapsed && (
