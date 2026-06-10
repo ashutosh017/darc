@@ -154,10 +154,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                   e.stopPropagation();
                   setActiveMenuChatId(activeMenuChatId === chat.id ? null : chat.id);
                 }}
-                className={cn(
-                  "absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors z-20",
-                  currentChatId === chat.id || activeMenuChatId === chat.id ? "opacity-100" : "opacity-0 group-hover:opacity-100"
-                )}
+                className="absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors z-20 opacity-100"
               >
                 <MoreVertical size={14} />
               </button>

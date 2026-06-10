@@ -10,7 +10,7 @@ export default function ChatDetailPage() {
 
   return (
     <Suspense fallback={null}>
-      <ChatInterface chatId={id} />
+      <ChatInterface chatId={id} key={id} />
     </Suspense>
   );
 }

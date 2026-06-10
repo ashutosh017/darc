@@ -13,7 +13,7 @@ import { AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
 import { saveMessage, getChatMessages, createChat } from "@/app/actions";
 import { useChat } from "@/lib/chat-context";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 interface Message {
   id: string;
@@ -32,15 +32,18 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(chatId !== null);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const skipNextFetchRef = useRef(false);
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   // Sync localChatId when the chatId prop changes
   useEffect(() => {
     setLocalChatId(chatId);
+    if (chatId !== null) {
+      setIsLoadingMessages(true);
+    }
   }, [chatId]);
 
   const handleSendMessage = useCallback(async (content: string) => {
@@ -142,10 +145,15 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         )
       );
 
-      // 5. If we started on the landing page (chatId was null), redirect now that streaming is complete
+      // 5. If we started on the landing page (chatId was null), update the URL in-place without triggering Next.js page reload/unmount
       if (!chatId) {
         await refreshChats();
-        router.replace(`/chat/${activeChatId}`);
+        const newUrl = `/chat/${activeChatId}`;
+        window.history.replaceState(
+          { ...window.history.state, as: newUrl, url: newUrl },
+          "",
+          newUrl
+        );
       }
     } catch (err: unknown) {
       console.error("[DARC Error]", err);
@@ -153,7 +161,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       setError(errorMessage);
       setIsTyping(false);
     }
-  }, [chatId, localChatId, session, refreshChats, router]);
+  }, [chatId, localChatId, session, refreshChats]);
 
   // Set current chat ID for sidebar highlighting
   useEffect(() => {
@@ -165,9 +173,11 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     let active = true;
     if (skipNextFetchRef.current) {
       skipNextFetchRef.current = false;
+      setIsLoadingMessages(false);
       return;
     }
     if (localChatId && session) {
+      setIsLoadingMessages(true);
       getChatMessages(localChatId).then((msgs) => {
         if (active) {
           setMessages(msgs.map(m => ({
@@ -176,11 +186,13 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
             text: m.text,
             isComplete: true
           })));
+          setIsLoadingMessages(false);
         }
       });
     } else {
       if (active) {
         setMessages([]);
+        setIsLoadingMessages(false);
       }
     }
     return () => {
@@ -227,7 +239,11 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         >
           <div className="max-w-3xl mx-auto pt-8 pb-32 md:pt-12">
             <AnimatePresence mode="popLayout">
-              {messages.length === 0 ? (
+              {isLoadingMessages ? (
+                <div key="loading" className="flex items-center justify-center py-20">
+                  <div className="w-8 h-8 border-4 border-t-transparent border-[#e3e3e3] rounded-full animate-spin" />
+                </div>
+              ) : messages.length === 0 ? (
                 <ChatHero key="hero" onPromptClick={handleSendMessage} />
               ) : (
                 <div key="messages" className="flex flex-col">

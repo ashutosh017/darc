@@ -6,7 +6,7 @@ import { ChatInterface } from "@/components/chat/ChatInterface";
 export default function ChatPage() {
   return (
     <Suspense fallback={null}>
-      <ChatInterface chatId={null} />
+      <ChatInterface chatId={null} key="new-chat" />
     </Suspense>
   );
 }
