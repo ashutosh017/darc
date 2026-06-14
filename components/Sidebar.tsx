@@ -9,7 +9,6 @@ import {
   X,
   LogOut,
   LogIn,
-  MessageSquare,
   Settings,
   MoreVertical,
   Share2,
@@ -135,80 +134,84 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           </div>
         )}
         
-        {chats.map((chat, index) => (
-          <div
-            key={chat.id}
-            onClick={() => {
-              router.push(`/chat/${chat.id}`);
-              if (isMobile) onClose?.();
-            }}
-            title={chat.title || "Untitled Chat"}
-            className={cn(
-              "flex items-center w-full gap-3 px-3 py-2.5 rounded-full transition-all duration-200 group relative cursor-pointer",
-              currentChatId === chat.id 
-                ? "bg-[#000000/20] text-[#e3e3e3]" 
-                : "text-[#e3e3e3] hover:bg-[#282a2c]"
-            )}
-          >
-            <MessageSquare size={18} className="shrink-0 text-[#b4b4b4] group-hover:text-[#e3e3e3]" />
-            {!isCollapsed && (
+        {chats.map((chat, index) => {
+          if (isCollapsed) return null;
+          return (
+            <div
+              key={chat.id}
+              onClick={() => {
+                router.push(`/chat/${chat.id}`);
+                if (isMobile) onClose?.();
+              }}
+              title={chat.title || "Untitled Chat"}
+              className={cn(
+                "flex items-center w-full px-3 py-2.5 rounded-full transition-all duration-200 group relative cursor-pointer",
+                currentChatId === chat.id 
+                  ? "bg-[#000000/20] text-[#e3e3e3]" 
+                  : "text-[#e3e3e3] hover:bg-[#282a2c]"
+              )}
+            >
               <span className="text-sm truncate pr-8">
                 {chat.title || "Untitled Chat"}
               </span>
-            )}
-            {!isCollapsed && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
                   setActiveMenuChatId(activeMenuChatId === chat.id ? null : chat.id);
                 }}
-                className="absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors z-20 opacity-100"
+                className={cn(
+                  "absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-all z-20",
+                  "hidden md:block",
+                  activeMenuChatId === chat.id
+                    ? "md:opacity-100"
+                    : "md:opacity-0 md:group-hover:opacity-100"
+                )}
               >
                 <MoreVertical size={14} />
               </button>
-            )}
 
-            {/* Dropdown Menu */}
-            {!isCollapsed && activeMenuChatId === chat.id && (
-              <div className={cn(
-                "absolute right-3 z-50 bg-[#282a2c] border border-[#3c4043]/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
-                index < 3 ? "top-full mt-1" : "bottom-full mb-1"
-              )}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveMenuChatId(null);
-                  }}
-                  className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
-                >
-                  <Share2 size={14} className="text-[#b4b4b4]" />
-                  <span>Share</span>
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveMenuChatId(null);
-                  }}
-                  className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
-                >
-                  <Pencil size={14} className="text-[#b4b4b4]" />
-                  <span>Rename</span>
-                </button>
-                <button
-                  onClick={async (e) => {
-                    e.stopPropagation();
-                    await handleDeleteChat(chat.id);
-                    setActiveMenuChatId(null);
-                  }}
-                  className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#f28b82] hover:bg-[#f28b82]/10 transition-colors"
-                >
-                  <Trash2 size={14} className="text-[#f28b82]" />
-                  <span>Delete</span>
-                </button>
-              </div>
-            )}
-          </div>
-        ))}
+              {/* Dropdown Menu */}
+              {activeMenuChatId === chat.id && (
+                <div className={cn(
+                  "absolute right-3 z-50 bg-[#282a2c] border border-[#3c4043]/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
+                  index < 3 ? "top-full mt-1" : "bottom-full mb-1"
+                )}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveMenuChatId(null);
+                    }}
+                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
+                  >
+                    <Share2 size={14} className="text-[#b4b4b4]" />
+                    <span>Share</span>
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveMenuChatId(null);
+                    }}
+                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
+                  >
+                    <Pencil size={14} className="text-[#b4b4b4]" />
+                    <span>Rename</span>
+                  </button>
+                  <button
+                    onClick={async (e) => {
+                      e.stopPropagation();
+                      await handleDeleteChat(chat.id);
+                      setActiveMenuChatId(null);
+                    }}
+                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#f28b82] hover:bg-[#f28b82]/10 transition-colors"
+                  >
+                    <Trash2 size={14} className="text-[#f28b82]" />
+                    <span>Delete</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         {isLoadingChats && !isCollapsed && (
           <div className="px-6 py-2 text-xs text-[#b4b4b4] animate-pulse">

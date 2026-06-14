@@ -50,21 +50,48 @@ async function logToFile(message: string) {
   }
 }
 
-async function translateToEnglish(ai: GoogleGenAI, text: string): Promise<string> {
+async function translateToEnglish(text: string): Promise<string> {
+  const groqApiKey = process.env.GROQ_API_KEY;
+  if (!groqApiKey) {
+    console.warn("[translateToEnglish] GROQ_API_KEY is not defined, falling back to original text");
+    return text;
+  }
+
   try {
-    const translationResult = await ai.models.generateContent({
-      model: GEMINI_MODEL,
-      contents: [
-        {
-          role: "user",
-          parts: [{
-            text: `Translate the following text into English. If it is already in English, output it exactly as-is. Output ONLY the translated English text, without any explanations, quotes, or additional formatting:\n\n"${text}"`
-          }]
-        }
-      ],
-      config: { temperature: 0 },
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${groqApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [
+          {
+            role: "user",
+            content: `Translate the following text into English. If it is already in English, output it exactly as-is. Output ONLY the translated English text, without any explanations, quotes, or additional formatting:\n\n"${text}"`,
+          },
+        ],
+        temperature: 0,
+      }),
     });
-    return translationResult.text?.trim() || text;
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error("[translateToEnglish] Groq API error:", errorText);
+      return text;
+    }
+
+    const data = await response.json() as {
+      choices?: Array<{
+        message?: {
+          content?: string;
+        };
+      }>;
+    };
+
+    const translatedText = data.choices?.[0]?.message?.content?.trim();
+    return translatedText || text;
   } catch (error) {
     console.error("[translateToEnglish] Error translating text:", error);
     return text;
@@ -207,7 +234,7 @@ export async function POST(req: NextRequest) {
     logToFile(`[DARC] 📨 Received chat request. message: "${message}" | chatId: ${chatId || 'none'}`);
 
     // 1. Translate user message to English
-    const englishMessage = await translateToEnglish(ai, message);
+    const englishMessage = await translateToEnglish(message);
     logToFile(`[DARC] 🌐 English translation: "${englishMessage}"`);
 
     // 2. Fetch Postgres chat history

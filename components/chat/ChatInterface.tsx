@@ -237,14 +237,14 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
           ref={scrollRef}
           className="h-full overflow-y-auto scrollbar-hide px-4 md:px-0"
         >
-          <div className="max-w-3xl mx-auto pt-8 pb-32 md:pt-12">
+          <div className="max-w-3xl mx-auto pt-8 pb-8 md:pt-12">
             <AnimatePresence mode="popLayout">
               {isLoadingMessages ? (
                 <div key="loading" className="flex items-center justify-center py-20">
                   <div className="w-8 h-8 border-4 border-t-transparent border-[#e3e3e3] rounded-full animate-spin" />
                 </div>
               ) : messages.length === 0 ? (
-                <ChatHero key="hero" onPromptClick={handleSendMessage} />
+                <ChatHero key="hero" />
               ) : (
                 <div key="messages" className="flex flex-col">
                   {messages.map((message) => (
