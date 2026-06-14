@@ -57,28 +57,55 @@ export function ChatHero({ onPromptClick }: ChatHeroProps) {
 }
 
 export function TypingIndicator() {
+  const [statusIndex, setStatusIndex] = React.useState(0);
+  const statuses = [
+    "Analyzing your situation...",
+    "Retrieving relationship database insights...",
+    "Synthesizing personal guidance...",
+    "Formulating response..."
+  ];
+
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setStatusIndex((prev) => (prev < statuses.length - 1 ? prev + 1 : prev));
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex mb-8"
+      className="flex flex-col gap-3.5 mb-8 pl-1"
     >
-      <div className="flex flex-col gap-2 pt-2">
-        <div className="flex items-center gap-1.5">
-          {[0, 1, 2].map((i) => (
-            <motion.div
-              key={i}
-              animate={{ opacity: [0.3, 1, 0.3] }}
-              transition={{ 
-                duration: 1.5, 
-                repeat: Infinity, 
-                delay: i * 0.2,
-                ease: "easeInOut"
-              }}
-              className="w-1.5 h-1.5 rounded-full bg-[#e3e3e3]"
-            />
-          ))}
+      <div className="flex items-center gap-3">
+        {/* Glowing Spinner */}
+        <div className="relative w-4.5 h-4.5 flex items-center justify-center shrink-0">
+          <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-[#8ab4f8] animate-spin" />
+          <div className="absolute inset-0 rounded-full border-2 border-[#8ab4f8]/15 animate-pulse" />
         </div>
+
+        {/* Status Text */}
+        <span className="text-sm font-medium text-[#b4b4b4]/90 tracking-wide select-none">
+          {statuses[statusIndex]}
+        </span>
+      </div>
+
+      {/* Typing dots */}
+      <div className="flex items-center gap-1.5 pl-7.5">
+        {[0, 1, 2].map((i) => (
+          <motion.div
+            key={i}
+            animate={{ opacity: [0.3, 1, 0.3] }}
+            transition={{ 
+              duration: 1.5, 
+              repeat: Infinity, 
+              delay: i * 0.2,
+              ease: "easeInOut"
+            }}
+            className="w-1.5 h-1.5 rounded-full bg-[#8ab4f8]/80"
+          />
+        ))}
       </div>
     </motion.div>
   );

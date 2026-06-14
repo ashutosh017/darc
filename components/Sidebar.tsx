@@ -52,7 +52,11 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       await deleteChat(chatId);
       await refreshChats();
       if (currentChatId === chatId) {
-        router.push("/");
+        if (typeof window !== "undefined" && window.location.pathname !== "/") {
+          window.location.href = "/";
+        } else {
+          router.push("/");
+        }
       }
     } catch (error) {
       console.error("Failed to delete chat:", error);
@@ -104,7 +108,11 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       )}>
         <button
           onClick={() => {
-            router.push("/");
+            if (typeof window !== "undefined" && window.location.pathname !== "/") {
+              window.location.href = "/";
+            } else {
+              router.push("/");
+            }
             if (isMobile) onClose?.();
           }}
           className={cn(
