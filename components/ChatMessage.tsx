@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { User, Copy, Check, ThumbsUp, ThumbsDown } from "lucide-react";
-import { useSession } from "@/lib/auth-client";
+import { Copy, Check, ThumbsUp, ThumbsDown } from "lucide-react";
 
 interface ChatMessageProps {
   role: "user" | "coach";
@@ -14,7 +13,6 @@ interface ChatMessageProps {
 
 export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
   const isCoach = role === "coach";
-  const { data: session } = useSession();
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
 
@@ -28,31 +26,11 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className={cn(
-        "flex w-full mb-10 gap-4 md:gap-8",
-        isCoach ? "flex-row" : "flex-row-reverse"
-      )}
+      className="flex w-full mb-10"
     >
-      {/* Avatar */}
-      <div className="shrink-0 pt-1 hidden md:flex">
-        {isCoach ? (
-          <div className="w-9 h-9 rounded-full bg-[#1e1f20] flex items-center justify-center border border-[#3c4043]/30 shadow-sm">
-            <div className="w-5.5 h-5.5 rounded-full bg-gradient-to-tr from-[#4285f4] via-[#9b72cb] to-[#d96570] opacity-90 animate-shimmer bg-[length:200%_100%]" />
-          </div>
-        ) : (
-          <div className="w-9 h-9 rounded-full overflow-hidden bg-[#1e1f20] flex items-center justify-center border border-[#3c4043]/30 shadow-sm">
-            {session?.user.image ? (
-              <img src={session.user.image} alt="User" className="w-full h-full object-cover" />
-            ) : (
-              <User size={20} className="text-[#b4b4b4]" />
-            )}
-          </div>
-        )}
-      </div>
-
       {/* Content Area */}
       <div className={cn(
-        "flex-1 max-w-full md:max-w-[calc(100%-3rem)] min-w-0",
+        "flex-1 max-w-full min-w-0",
         !isCoach && "flex flex-col items-end"
       )}>
         <div className={cn(

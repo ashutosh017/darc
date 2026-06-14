@@ -61,11 +61,8 @@ export function TypingIndicator() {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="flex gap-4 mb-8"
+      className="flex mb-8"
     >
-      <div className="w-8 h-8 rounded-full bg-[#1e1f20] flex items-center justify-center shrink-0 mt-1">
-        <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-[#4285f4] to-[#d96570] animate-spin-slow opacity-80" />
-      </div>
       <div className="flex flex-col gap-2 pt-2">
         <div className="flex items-center gap-1.5">
           {[0, 1, 2].map((i) => (

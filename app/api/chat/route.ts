@@ -2,6 +2,9 @@ import { GoogleGenAI } from "@google/genai";
 import { NextRequest } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { Pinecone } from "@pinecone-database/pinecone";
+import fs from "fs/promises";
+import path from "path";
 
 /**
  * Layer 2: Core System Instructions (The Blueprint)
@@ -48,6 +51,102 @@ const BANNED_PHRASES = [
   "ignore all previous instructions",
 ];
 
+const GEMINI_MODEL = "gemini-3.1-flash-lite";
+
+async function logToFile(message: string) {
+  try {
+    const logPath = path.join(process.cwd(), "darc-execution.log");
+    const timestamp = new Date().toISOString();
+    fs.appendFile(logPath, `[${timestamp}] ${message}\n`, "utf-8").catch((err) => {
+      console.error("[logToFile] Failed to write log:", err);
+    });
+  } catch (err) {
+    console.error("[logToFile] Error in logToFile:", err);
+  }
+}
+
+async function translateToEnglish(ai: GoogleGenAI, text: string): Promise<string> {
+  try {
+    const translationResult = await ai.models.generateContent({
+      model: GEMINI_MODEL,
+      contents: [
+        {
+          role: "user",
+          parts: [{
+            text: `Translate the following text into English. If it is already in English, output it exactly as-is. Output ONLY the translated English text, without any explanations, quotes, or additional formatting:\n\n"${text}"`
+          }]
+        }
+      ],
+      config: { temperature: 0 },
+    });
+    return translationResult.text?.trim() || text;
+  } catch (error) {
+    console.error("[translateToEnglish] Error translating text:", error);
+    return text;
+  }
+}
+
+async function getPineconeContext(queryText: string): Promise<string> {
+  const pineconeApiKey = process.env.PINECONE_API_KEY;
+  if (!pineconeApiKey) {
+    console.warn("[getPineconeContext] PINECONE_API_KEY is not defined");
+    return "";
+  }
+
+  try {
+    const pc = new Pinecone({ apiKey: pineconeApiKey });
+    const embeddingResult = await pc.inference.embed({
+      model: 'multilingual-e5-large',
+      inputs: [queryText],
+      parameters: {
+        input_type: 'query',
+      }
+    });
+
+    const firstEmbedding = embeddingResult.data?.[0];
+    const queryVector = firstEmbedding && firstEmbedding.vectorType === 'dense'
+      ? firstEmbedding.values
+      : undefined;
+    if (!queryVector) {
+      console.warn("[getPineconeContext] Failed to generate embedding values from Pinecone");
+      return "";
+    }
+    logToFile("[DARC] [Pinecone] 🧠 Generated E5 embedding successfully.");
+
+    const indexName = process.env.PINECONE_INDEX || 'youtube-transcripts';
+    const index = pc.Index(indexName);
+
+    const queryResponse = await index.query({
+      vector: queryVector,
+      topK: 5,
+      includeMetadata: true,
+    });
+
+    if (!queryResponse.matches || queryResponse.matches.length === 0) {
+      logToFile("[DARC] [Pinecone] 🔍 Query finished. No matches found.");
+      return "";
+    }
+
+    logToFile(`[DARC] [Pinecone] 🔍 Query matches found: ${queryResponse.matches.length}`);
+    queryResponse.matches.forEach((match, index) => {
+      const metadata = match.metadata as { text?: string; videoTitle?: string } | undefined;
+      logToFile(`  [Match ${index + 1}] Score: ${match.score?.toFixed(4)} | Video: "${metadata?.videoTitle || 'Unknown'}" | Snippet: "${metadata?.text?.slice(0, 80)}..."`);
+    });
+
+    return queryResponse.matches
+      .map((match) => {
+        const metadata = match.metadata as { text?: string; videoTitle?: string } | undefined;
+        if (!metadata || !metadata.text) return '';
+        return `[Source Video: ${metadata.videoTitle || 'Unknown'}] ${metadata.text}`;
+      })
+      .filter(Boolean)
+      .join('\n\n');
+  } catch (error) {
+    console.error("[getPineconeContext] Error fetching context from Pinecone:", error);
+    return "";
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     // 1. Authentication Check
@@ -82,11 +181,21 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    logToFile(`\n--- [DARC Request Start] ---`);
+    logToFile(`[DARC] 📨 Received chat request. message: "${message}" | chatId: ${chatId || 'none'}`);
+
+    // 1. Translate user message to English
+    const englishMessage = await translateToEnglish(ai, message);
+    logToFile(`[DARC] 🌐 English translation: "${englishMessage}"`);
+
+    // 2. Retrieve relevant context from Pinecone
+    const context = await getPineconeContext(englishMessage);
+
     /**
      * Layer 1: The Input Guardrail
      */
     // const guardrail = await ai.models.generateContent({
-    //   model: "gemini-3.1-flash-lite",
+    //   model: GEMINI_MODEL,
     //   contents: [
     //     {
     //       role: "user",
@@ -112,6 +221,8 @@ export async function POST(req: NextRequest) {
         orderBy: { createdAt: "asc" },
       });
 
+      logToFile(`[DARC] [Postgres] 🗄️ Fetched ${dbMessages.length} previous messages for chatId: ${chatId}`);
+
       contents = dbMessages.map((m) => ({
         role: m.role === "USER" ? "user" : "model",
         parts: [{ text: m.text }],
@@ -126,14 +237,31 @@ export async function POST(req: NextRequest) {
         contents.push({ role: "user", parts: [{ text: message }] });
       }
     } else {
+      logToFile(`[DARC] [Postgres] 🗄️ No chatId. Starting a new chat session.`);
       contents = [{ role: "user", parts: [{ text: message }] }];
     }
 
+    // 3. Formulate dynamic system instruction with context
+    let dynamicSystemInstruction = SYSTEM_INSTRUCTION;
+    if (context) {
+      dynamicSystemInstruction = `${SYSTEM_INSTRUCTION}
+
+You have access to the following relevant context retrieved from your coaching resource base (transcripts of your videos). Use this context to answer the user's query if it is relevant. Do not mention search, databases, or context. Maintain your persona and tone as DaRC.
+
+Retrieved Context:
+${context}`;
+    }
+
+    logToFile(`[DARC] [AI Input] 🚀 Feeding data to Gemini model (${GEMINI_MODEL}):`);
+    logToFile(`  - System Instruction length: ${dynamicSystemInstruction.length} characters`);
+    logToFile(`  - Context included: ${context ? "Yes" : "No"} (${context ? context.length : 0} characters)`);
+    logToFile(`  - Conversational history length: ${contents.length} turns`);
+
     const streamResponse = await ai.models.generateContentStream({
-      model: "gemini-3.1-flash-lite",
+      model: GEMINI_MODEL,
       contents,
       config:{
-        systemInstruction: SYSTEM_INSTRUCTION,
+        systemInstruction: dynamicSystemInstruction,
         // safetySettings: SAFETY_SETTINGS,
         temperature: 1, topP: 0.9, topK: 40 
       },
@@ -148,7 +276,7 @@ export async function POST(req: NextRequest) {
           for await (const chunk of streamResponse) {
             const chunkText = chunk.text || "";
             fullBuffer += chunkText.toLowerCase();
-            console.log("full buffer: ",fullBuffer)
+            logToFile(`full buffer: ${fullBuffer}`);
             if (BANNED_PHRASES.some((phrase) => fullBuffer.includes(phrase))) {
               controller.close();
               return;
