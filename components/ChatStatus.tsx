@@ -12,12 +12,60 @@ export function ChatHero() {
     : "Friend";
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-3xl mx-auto text-center px-4">
+    <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-3xl mx-auto text-center px-4 relative">
+      {/* Soft romantic background blobs */}
+      <div className="absolute inset-0 overflow-visible pointer-events-none z-0">
+        {/* Rose pink blob */}
+        <motion.div
+          animate={{
+            x: [0, 30, -20, 0],
+            y: [0, -40, 30, 0],
+            scale: [1, 1.1, 0.95, 1],
+          }}
+          transition={{
+            duration: 12,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -top-[20%] -left-[30%] w-[35vw] h-[35vw] max-w-[400px] max-h-[400px] rounded-full bg-gradient-to-br from-[#d96570]/30 to-[#9b72cb]/20 opacity-40 blur-[80px]"
+        />
+
+        {/* Sunset peach blob */}
+        <motion.div
+          animate={{
+            x: [0, -40, 20, 0],
+            y: [0, 30, -30, 0],
+            scale: [1, 0.95, 1.05, 1],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute top-[20%] -right-[30%] w-[30vw] h-[30vw] max-w-[350px] max-h-[350px] rounded-full bg-gradient-to-br from-[#f0a551]/20 to-[#d96570]/25 opacity-30 blur-[80px]"
+        />
+
+        {/* Soft lavender blob */}
+        <motion.div
+          animate={{
+            x: [0, 20, -30, 0],
+            y: [0, 30, 40, 0],
+            scale: [1, 1.05, 0.95, 1],
+          }}
+          transition={{
+            duration: 18,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+          className="absolute -bottom-[20%] -left-[10%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-br from-[#9b72cb]/30 to-[#4285f4]/20 opacity-35 blur-[90px]"
+        />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
-        className="flex flex-col items-center"
+        className="flex flex-col items-center relative z-10"
       >
         <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-4 text-white">
           Hello, {firstName}

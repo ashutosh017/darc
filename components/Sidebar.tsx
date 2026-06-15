@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { 
   Plus, 
@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
 import { useChat } from "@/lib/chat-context";
 import { useRouter } from "next/navigation";
-import { deleteChat } from "@/app/actions";
+import { deleteChat, getUserDailyLimitStats } from "@/app/actions";
 
 interface SidebarProps {
   isMobile?: boolean;
@@ -32,6 +32,43 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const { data: session, isPending } = useSession();
   const { chats, currentChatId, refreshChats, isLoadingChats } = useChat();
   const router = useRouter();
+
+  const [limitStats, setLimitStats] = useState<{ chatsUsed: number; dailyLimit: number } | null>(null);
+
+  const fetchLimitStats = useCallback(async () => {
+    if (session) {
+      try {
+        const stats = await getUserDailyLimitStats();
+        setLimitStats(stats);
+      } catch (err) {
+        console.error("Failed to fetch limit stats:", err);
+      }
+    } else {
+      setLimitStats(null);
+    }
+  }, [session]);
+
+  useEffect(() => {
+    fetchLimitStats();
+  }, [fetchLimitStats, chats]);
+
+  // Load state on mount
+  useEffect(() => {
+    if (isMobile) {
+      setIsCollapsed(false);
+      return;
+    }
+    const saved = localStorage.getItem("sidebar-collapsed");
+    if (saved !== null) {
+      setIsCollapsed(JSON.parse(saved));
+    }
+  }, [isMobile]);
+
+  const handleToggleCollapse = (collapsed: boolean) => {
+    if (isMobile) return;
+    setIsCollapsed(collapsed);
+    localStorage.setItem("sidebar-collapsed", JSON.stringify(collapsed));
+  };
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -82,16 +119,23 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       )}>
         {isCollapsed ? (
           <button 
-            onClick={() => setIsCollapsed(false)}
+            onClick={() => handleToggleCollapse(false)}
             className="p-2 hover:bg-[#282a2c] rounded-full transition-colors text-[#b4b4b4] hover:text-[#e3e3e3]"
           >
             <Menu size={24} />
           </button>
         ) : (
           <>
-            <span className="text-xl font-medium tracking-tight ml-2">DARC</span>
+            <div className="flex items-center gap-2.5 ml-2 select-none">
+              <img 
+                src="/darc-ai-logo.png" 
+                alt="DARC Logo" 
+                className="w-6 h-6 object-contain"
+              />
+              <span className="text-xl font-medium tracking-tight">DARC</span>
+            </div>
             <button 
-              onClick={() => (isMobile ? onClose?.() : setIsCollapsed(true))}
+              onClick={() => (isMobile ? onClose?.() : handleToggleCollapse(true))}
               className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors"
             >
               <X size={24} />
@@ -161,10 +205,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                 }}
                 className={cn(
                   "absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-all z-20",
-                  "hidden md:block",
                   activeMenuChatId === chat.id
-                    ? "md:opacity-100"
-                    : "md:opacity-0 md:group-hover:opacity-100"
+                    ? "opacity-100"
+                    : "opacity-100 md:opacity-0 md:group-hover:opacity-100"
                 )}
               >
                 <MoreVertical size={14} />
@@ -221,10 +264,74 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       </div>
 
       {/* Bottom Controls */}
-      <div className="mt-auto p-3 border-t border-[#3c4043]/30">
+      <div className="mt-auto p-3 border-t border-[#3c4043]/30 flex flex-col gap-2 shrink-0">
+        {/* Daily Limit Stats */}
+        {limitStats && (
+          isCollapsed ? (
+            <div 
+              className="flex justify-center py-2 cursor-default select-none shrink-0" 
+              title={`Daily Limit: ${limitStats.chatsUsed}/${limitStats.dailyLimit} chats used`}
+            >
+              <div className="relative w-10 h-10 flex items-center justify-center">
+                <svg className="w-10 h-10">
+                  <defs>
+                    <linearGradient id="limitRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#4285f4" />
+                      <stop offset="100%" stopColor="#9b72cb" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    className="stroke-[#3c4043]/30"
+                    strokeWidth="2.5"
+                    fill="transparent"
+                  />
+                  <circle
+                    cx="20"
+                    cy="20"
+                    r="16"
+                    stroke="url(#limitRingGradient)"
+                    strokeWidth="2.5"
+                    fill="transparent"
+                    strokeDasharray={100.5}
+                    strokeDashoffset={100.5 - (100.5 * Math.min(limitStats.chatsUsed, limitStats.dailyLimit)) / limitStats.dailyLimit}
+                    strokeLinecap="round"
+                    className="transform -rotate-90 origin-center"
+                    style={{ transition: "stroke-dashoffset 0.3s ease" }}
+                  />
+                </svg>
+                <span className="absolute text-[10px] font-bold text-[#e3e3e3]">
+                  {limitStats.chatsUsed}
+                </span>
+              </div>
+            </div>
+          ) : (
+            <div className="px-4 py-3 bg-[#1a1a1c] border border-[#3c4043]/20 rounded-2xl flex flex-col gap-2 select-none">
+              <div className="flex items-center justify-between text-xs">
+                <span className="text-zinc-400 font-medium">Daily Limit</span>
+                <span className="text-[#8ab4f8] font-bold">
+                  {limitStats.chatsUsed}/{limitStats.dailyLimit}
+                </span>
+              </div>
+              <div className="w-full bg-[#3c4043]/30 h-1.5 rounded-full overflow-hidden">
+                <div 
+                  className="bg-gradient-to-r from-[#4285f4] to-[#9b72cb] h-full rounded-full transition-all duration-300"
+                  style={{ width: `${Math.min(100, (limitStats.chatsUsed / limitStats.dailyLimit) * 100)}%` }}
+                />
+              </div>
+            </div>
+          )
+        )}
+
         {session ? (
-          <div className="flex flex-col gap-1">
+          <div className="flex flex-col gap-2">
             <button
+              onClick={() => {
+                router.push("/settings");
+                if (isMobile) onClose?.();
+              }}
               className={cn(
                 "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-[#e3e3e3] hover:bg-[#282a2c] transition-colors",
                 isCollapsed && "justify-center"
@@ -234,7 +341,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               {!isCollapsed && <span className="text-sm">Settings</span>}
             </button>
             <div className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-[#282a2c] cursor-pointer transition-colors mt-1",
+              "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-[#282a2c] cursor-pointer transition-colors",
               isCollapsed && "justify-center"
             )}>
               {session.user.image ? (

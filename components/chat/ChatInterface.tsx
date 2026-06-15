@@ -11,9 +11,10 @@ import { SignInModal } from "@/components/SignInModal";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
-import { saveMessage, getChatMessages, createChat } from "@/app/actions";
+import { saveMessage, getChatMessages, createChat, checkProfilePrompted } from "@/app/actions";
 import { useChat } from "@/lib/chat-context";
 import { useSearchParams } from "next/navigation";
+import { ProfilePromptModal } from "@/components/ProfilePromptModal";
 
 interface Message {
   id: string;
@@ -33,6 +34,18 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(chatId !== null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check if user should be prompted for profile details
+  useEffect(() => {
+    if (session) {
+      checkProfilePrompted().then((res) => {
+        if (!res.prompted) {
+          setShowOnboarding(true);
+        }
+      });
+    }
+  }, [session]);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const skipNextFetchRef = useRef(false);
@@ -231,6 +244,12 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       <MobileHeader />
       
       {!session && <SignInModal />}
+      {session && (
+        <ProfilePromptModal 
+          isOpen={showOnboarding} 
+          onClose={() => setShowOnboarding(false)} 
+        />
+      )}
       
       <div className="flex-1 relative overflow-hidden">
         <div 

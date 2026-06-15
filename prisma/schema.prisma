@@ -13,16 +13,34 @@ datasource db {
 }
 
 model User {
-  id            String    @id
-  name          String
-  email         String    @unique
-  emailVerified Boolean
-  image         String?
-  createdAt     DateTime
-  updatedAt     DateTime
-  sessions      Session[]
-  accounts      Account[]
-  chats         Chat[]
+  id                String    @id
+  name              String
+  email             String    @unique
+  emailVerified     Boolean
+  image             String?
+  createdAt         DateTime
+  updatedAt         DateTime
+  sessions          Session[]
+  accounts          Account[]
+  chats             Chat[]
+  dailyLimit        Int       @default(10)
+  chatsUsed         Int       @default(0)
+
+  // Onboarding / Profile Details
+  age               Int?
+  dob               DateTime?
+  educationSchool   String?
+  educationDegree   String?
+  educationYear     String?
+  employmentDetails String?
+  datingGoals       String?
+  seekingReason     String?
+  location          String?
+  annualIncome      String?
+  instaUrl          String?
+  linkedinUrl       String?
+  xUrl              String?
+  profilePrompted   Boolean   @default(false)
 
   @@map("user")
 }
