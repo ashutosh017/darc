@@ -9,7 +9,7 @@
     "lint": "eslint",
     "migrate:prod": "dotenv -e .env.production -- bunx prisma migrate deploy",
     "reset:prod": "dotenv -e .env.production -- bunx prisma reset",
-    "postinstall": "bunx prisma generate"
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@better-auth/kysely-adapter": "^1.6.13",
