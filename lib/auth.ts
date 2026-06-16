@@ -13,7 +13,11 @@ export const auth = betterAuth({
     baseURL: process.env.BETTER_AUTH_URL, 
     trustedOrigins: [
         "https://darc.com",
-        "https://www.darc.com"
+        "https://www.darc.com",
+        "https://darc.fun",
+        "https://www.darc.fun",
+        "http://localhost:*",
+        "http://127.0.0.1:*"
     ], 
     socialProviders: {
         google: { 
