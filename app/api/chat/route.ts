@@ -303,7 +303,6 @@ ${profileParts.join('\n')}`;
 
     // 2. Fetch Postgres chat history (sliding window of last 20 messages)
     let contents = [];
-    let incrementChatsUsed = false;
     if (chatId) {
       const dbMessages = await db.message.findMany({
         where: { chat_id: chatId, chat: { user_id: session.user.id } },
@@ -312,44 +311,6 @@ ${profileParts.join('\n')}`;
       });
       // Reverse to restore chronological order (oldest first)
       dbMessages.reverse();
-
-      // Check daily chat limit at the user level
-      const isNewChat = dbMessages.length === 0;
-      if (isNewChat) {
-        incrementChatsUsed = true;
-        const startOfDay = new Date();
-        startOfDay.setUTCHours(0, 0, 0, 0);
-
-        const todayChatCount = await db.chat.count({
-          where: {
-            user_id: session.user.id,
-            id: { not: chatId },
-            createdAt: { gte: startOfDay },
-          },
-        });
-
-        // Reset chatsUsed to 0 if it is the user's first chat of the day
-        if (todayChatCount === 0) {
-          await db.user.update({
-            where: { id: session.user.id },
-            data: { chatsUsed: 0 },
-          });
-          logToFile(`[DARC] 🔄 First chat of the day. Resetting chatsUsed to 0 for user ${session.user.id}`);
-          if (user) {
-            user.chatsUsed = 0;
-          }
-        }
-
-        if (user) {
-          if (user.chatsUsed >= user.dailyLimit) {
-            logToFile(`[DARC] 🛑 Daily limit of ${user.dailyLimit} chats reached for user: ${session.user.id}`);
-            return new Response(
-              JSON.stringify({ error: `You have reached your daily limit of ${user.dailyLimit} chats. Please try again tomorrow.` }),
-              { status: 403, headers: { "Content-Type": "application/json" } }
-            );
-          }
-        }
-      }
 
       logToFile(`[DARC] [Postgres] 🗄️ Fetched ${dbMessages.length} previous messages for chatId: ${chatId}`);
 
@@ -370,6 +331,48 @@ ${profileParts.join('\n')}`;
       logToFile(`[DARC] [Postgres] 🗄️ No chatId. Starting a new chat session.`);
       contents = [{ role: "user", parts: [{ text: message }] }];
     }
+
+    // Check daily limit and increment for every prompt request
+    const startOfDay = new Date();
+    startOfDay.setUTCHours(0, 0, 0, 0);
+
+    // Find the last user message to see if we need to reset the counter for a new day
+    const lastUserMessage = await db.message.findFirst({
+      where: {
+        chat: { user_id: session.user.id },
+        role: "USER",
+      },
+      orderBy: { createdAt: "desc" },
+    });
+
+    // Reset chatsUsed to 0 if the last message was sent before today
+    if (!lastUserMessage || lastUserMessage.createdAt < startOfDay) {
+      await db.user.update({
+        where: { id: session.user.id },
+        data: { chatsUsed: 0 },
+      });
+      logToFile(`[DARC] 🔄 New day detected (last message: ${lastUserMessage?.createdAt || 'never'}). Resetting chatsUsed to 0 for user ${session.user.id}`);
+      if (user) {
+        user.chatsUsed = 0;
+      }
+    }
+
+    if (user) {
+      if (user.chatsUsed >= user.dailyLimit) {
+        logToFile(`[DARC] 🛑 Daily limit of ${user.dailyLimit} prompts reached for user: ${session.user.id}`);
+        return new Response(
+          JSON.stringify({ error: `You have reached your daily limit of ${user.dailyLimit} prompts. Please try again tomorrow.` }),
+          { status: 403, headers: { "Content-Type": "application/json" } }
+        );
+      }
+    }
+
+    // Increment immediately on the server before starting generation
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { chatsUsed: { increment: 1 } },
+    });
+    logToFile(`[DARC] 📉 Incrementing prompts used for user ${session.user.id} by 1. Total: ${user ? user.chatsUsed + 1 : 1}`);
 
     // 3. Decide what to retrieve from Pinecone based on context and current message
     const decisionContents = [...contents];
@@ -441,13 +444,6 @@ ${context}`;
             controller.enqueue(encoder.encode(chunkText));
           }
           logToFile(`[DARC] [AI Output] 🤖 Response: "${originalResponseBuffer}"`);
-          if (incrementChatsUsed) {
-            await db.user.update({
-              where: { id: session.user.id },
-              data: { chatsUsed: { increment: 1 } },
-            });
-            logToFile(`[DARC] 📉 Incrementing chatsUsed for user ${session.user.id} by 1.`);
-          }
           controller.close();
         } catch (streamError: unknown) {
           console.error("[DARC Stream Error]", streamError);

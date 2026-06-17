@@ -11,7 +11,7 @@ import { SignInModal } from "@/components/SignInModal";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
-import { saveMessage, getChatMessages, createChat, checkProfilePrompted } from "@/app/actions";
+import { saveMessage, getChatMessages, createChat, checkProfilePrompted, getUserDailyLimitStats, deleteMessage } from "@/app/actions";
 import { useChat } from "@/lib/chat-context";
 import { useSearchParams } from "next/navigation";
 import { ProfilePromptModal } from "@/components/ProfilePromptModal";
@@ -25,7 +25,7 @@ interface Message {
 
 export function ChatInterface({ chatId }: { chatId: string | null }) {
   const { data: session, isPending: isSessionPending } = useSession();
-  const { setCurrentChatId, refreshChats } = useChat();
+  const { setCurrentChatId, refreshChats, refreshLimitStats, limitStats } = useChat();
   
   // Track the current chat ID locally to support seamless transitions
   const [localChatId, setLocalChatId] = useState<string | null>(chatId);
@@ -66,6 +66,17 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       return;
     }
 
+    if (limitStats && limitStats.chatsUsed >= limitStats.dailyLimit) {
+      return;
+    }
+
+    // Authoritative check against the DB before starting mutations
+    const freshStats = await getUserDailyLimitStats();
+    if (freshStats && freshStats.chatsUsed >= freshStats.dailyLimit) {
+      await refreshLimitStats();
+      return;
+    }
+
     setError(null);
     let activeChatId = localChatId;
 
@@ -80,6 +91,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     setMessages((prev) => [...prev, userMessage]);
     setIsTyping(true);
 
+    let savedUserMsgId: string | null = null;
     try {
       // 1. Create chat if it doesn't exist (i.e. on the landing page)
       if (!activeChatId) {
@@ -91,6 +103,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
 
       // 2. Save User Message to DB
       const userMsg = await saveMessage(activeChatId, content, "USER");
+      savedUserMsgId = userMsg.id;
       
       // Update temporary user message with actual DB ID
       setMessages((prev) => 
@@ -111,8 +124,37 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       });
 
       if (!response.ok) {
-        throw new Error("Connection interrupted. Please try rephrasing your relationship query.");
+        let errMsg = "Connection interrupted. Please try rephrasing your relationship query.";
+        let isLimitReached = false;
+        try {
+          const data = await response.json();
+          if (data && data.error) {
+            errMsg = data.error;
+            if (response.status === 403 || errMsg.toLowerCase().includes("daily limit") || errMsg.toLowerCase().includes("limit reached")) {
+              isLimitReached = true;
+            }
+          }
+        } catch {
+          // ignore
+        }
+
+        if (isLimitReached) {
+          // Remove user message from database
+          if (savedUserMsgId) {
+            await deleteMessage(savedUserMsgId);
+          }
+          // Remove user message from UI list
+          setMessages((prev) => prev.filter((msg) => msg.id !== savedUserMsgId && msg.id !== userMessageId));
+          await refreshLimitStats();
+          setIsTyping(false);
+          return; // Exit silently
+        }
+
+        throw new Error(errMsg);
       }
+
+      // Refresh daily limit usage stats immediately
+      refreshLimitStats();
 
       const coachMessageId = "temp-" + Date.now();
       const coachMessage: Message = {
@@ -171,10 +213,24 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     } catch (err: unknown) {
       console.error("[DARC Error]", err);
       const errorMessage = err instanceof Error ? err.message : "Connection interrupted.";
-      setError(errorMessage);
+      // Do not show error on frontend if it mentions daily limit/rate limit
+      if (errorMessage.toLowerCase().includes("daily limit") || errorMessage.toLowerCase().includes("limit reached")) {
+        // Safe-guard to remove user message if it was somehow saved but failed later
+        if (savedUserMsgId) {
+          try {
+            await deleteMessage(savedUserMsgId);
+          } catch {
+            // ignore
+          }
+        }
+        setMessages((prev) => prev.filter((msg) => msg.id !== savedUserMsgId && msg.id !== userMessageId));
+        await refreshLimitStats();
+      } else {
+        setError(errorMessage);
+      }
       setIsTyping(false);
     }
-  }, [chatId, localChatId, session, refreshChats]);
+  }, [chatId, localChatId, session, refreshChats, refreshLimitStats, limitStats]);
 
   // Set current chat ID for sidebar highlighting
   useEffect(() => {
@@ -298,7 +354,18 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
 
       {session && (
         <div className="relative z-20 pb-2 md:pb-6 bg-gradient-to-t from-[#131314] via-[#131314] to-transparent pt-8">
-          <ChatInput onSendMessage={handleSendMessage} disabled={isTyping} />
+          {limitStats && limitStats.chatsUsed >= limitStats.dailyLimit && (
+            <div className="max-w-3xl mx-auto px-4 mb-3">
+              <div className="py-2.5 px-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs text-zinc-400 text-center flex items-center justify-center gap-2">
+                <span>🔒 You've used all your {limitStats.dailyLimit} free prompts for today. Your daily limit resets tomorrow.</span>
+              </div>
+            </div>
+          )}
+          <ChatInput 
+            onSendMessage={handleSendMessage} 
+            disabled={isTyping || (limitStats !== null && limitStats.chatsUsed >= limitStats.dailyLimit)} 
+            placeholder={limitStats && limitStats.chatsUsed >= limitStats.dailyLimit ? "Daily limit reached. Let's continue tomorrow!" : "Ask DARC..."}
+          />
         </div>
       )}
     </div>

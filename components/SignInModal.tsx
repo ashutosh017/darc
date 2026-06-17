@@ -23,7 +23,11 @@ export function SignInModal() {
 
         <div className="relative flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-2xl bg-[#131314] flex items-center justify-center mb-8 border border-[#3c4043]/30 shadow-inner">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#4285f4] to-[#d96570] animate-pulse" />
+            <img 
+              src="/darc-ai-logo.png" 
+              alt="DARC Logo" 
+              className="w-10 h-10 object-contain"
+            />
           </div>
           
           <h2 className="text-3xl font-semibold text-[#e3e3e3] mb-4 tracking-tight">
@@ -35,7 +39,7 @@ export function SignInModal() {
           </p>
           
           <button
-            onClick={() => signIn.social({ provider: "google" })}
+            onClick={() => signIn.social({ provider: "google", callbackURL: "/chat" })}
             className="flex items-center justify-center gap-3 w-full py-4 bg-[#e3e3e3] text-[#131314] rounded-full font-semibold hover:bg-white transition-all active:scale-[0.98] shadow-lg group"
           >
             <LogIn size={20} className="transition-transform group-hover:translate-x-1" />

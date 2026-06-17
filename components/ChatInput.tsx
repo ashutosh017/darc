@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils";
 interface ChatInputProps {
   onSendMessage: (message: string) => void;
   disabled?: boolean;
+  placeholder?: string;
 }
 
-export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
+export function ChatInput({ onSendMessage, disabled, placeholder }: ChatInputProps) {
   const [message, setMessage] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -49,7 +50,7 @@ export function ChatInput({ onSendMessage, disabled }: ChatInputProps) {
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask DARC..."
+            placeholder={placeholder || "Ask DARC..."}
             disabled={disabled}
             className="w-full bg-transparent border-none focus:ring-0 outline-none text-[#e3e3e3] resize-none py-3 px-4 max-h-[200px] overflow-y-auto scrollbar-hide text-[16px] leading-relaxed placeholder:text-[#b4b4b4]"
           />

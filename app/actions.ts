@@ -177,6 +177,26 @@ export async function getUserDailyLimitStats() {
   const session = await getSession();
   if (!session) return null;
 
+  const startOfDay = new Date();
+  startOfDay.setUTCHours(0, 0, 0, 0);
+
+  // Find the last user message to see if we need to reset the counter for a new day
+  const lastUserMessage = await db.message.findFirst({
+    where: {
+      chat: { user_id: session.user.id },
+      role: "USER",
+    },
+    orderBy: { createdAt: "desc" },
+  });
+
+  // Reset chatsUsed to 0 if the last message was sent before today
+  if (!lastUserMessage || lastUserMessage.createdAt < startOfDay) {
+    await db.user.update({
+      where: { id: session.user.id },
+      data: { chatsUsed: 0 },
+    });
+  }
+
   const user = await db.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -211,3 +231,22 @@ export async function getUserProfile() {
     },
   });
 }
+
+export async function deleteMessage(messageId: string) {
+  const session = await getSession();
+  if (!session) throw new Error("Unauthorized");
+
+  const message = await db.message.findFirst({
+    where: {
+      id: messageId,
+      chat: { user_id: session.user.id }
+    }
+  });
+
+  if (!message) return null;
+
+  return await db.message.delete({
+    where: { id: messageId }
+  });
+}
+

@@ -19,7 +19,7 @@ import { motion } from "framer-motion";
 import { useSession, signIn, signOut } from "@/lib/auth-client";
 import { useChat } from "@/lib/chat-context";
 import { useRouter } from "next/navigation";
-import { deleteChat, getUserDailyLimitStats } from "@/app/actions";
+import { deleteChat } from "@/app/actions";
 
 interface SidebarProps {
   isMobile?: boolean;
@@ -30,27 +30,8 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenuChatId, setActiveMenuChatId] = useState<string | null>(null);
   const { data: session, isPending } = useSession();
-  const { chats, currentChatId, refreshChats, isLoadingChats } = useChat();
+  const { chats, currentChatId, refreshChats, isLoadingChats, limitStats } = useChat();
   const router = useRouter();
-
-  const [limitStats, setLimitStats] = useState<{ chatsUsed: number; dailyLimit: number } | null>(null);
-
-  const fetchLimitStats = useCallback(async () => {
-    if (session) {
-      try {
-        const stats = await getUserDailyLimitStats();
-        setLimitStats(stats);
-      } catch (err) {
-        console.error("Failed to fetch limit stats:", err);
-      }
-    } else {
-      setLimitStats(null);
-    }
-  }, [session]);
-
-  useEffect(() => {
-    fetchLimitStats();
-  }, [fetchLimitStats, chats]);
 
   // Load state on mount
   useEffect(() => {
@@ -88,10 +69,10 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       await deleteChat(chatId);
       await refreshChats();
       if (currentChatId === chatId) {
-        if (typeof window !== "undefined" && window.location.pathname !== "/") {
-          window.location.href = "/";
+        if (typeof window !== "undefined" && window.location.pathname !== "/chat") {
+          window.location.href = "/chat";
         } else {
-          router.push("/");
+          router.push("/chat");
         }
       }
     } catch (error) {
@@ -105,7 +86,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
     } else {
       await signIn.social({
         provider: "google",
-        callbackURL: "/",
+        callbackURL: "/chat",
       });
     }
   };
@@ -151,10 +132,10 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       )}>
         <button
           onClick={() => {
-            if (typeof window !== "undefined" && window.location.pathname !== "/") {
-              window.location.href = "/";
+            if (typeof window !== "undefined" && window.location.pathname !== "/chat") {
+              window.location.href = "/chat";
             } else {
-              router.push("/");
+              router.push("/chat");
             }
             if (isMobile) onClose?.();
           }}

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { Sidebar } from "@/components/Sidebar";
-import { ChatProvider } from "@/lib/chat-context";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +13,69 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DARC | Dating and Relationship Coach",
-  description: "AI-powered relationship coaching for the modern age.",
+  metadataBase: new URL("https://darc.fun"),
+  title: {
+    default: "DARC | AI Dating & Relationship Coach",
+    template: "%s | DARC",
+  },
+  description: "DARC is your personal AI Dating and Relationship Coach. Get expert, personalized relationship advice, communication tips, and dating guidance instantly.",
+  keywords: [
+    "dating coach",
+    "relationship advice",
+    "dating assistant",
+    "relationship coach AI",
+    "dating tips",
+    "dating help",
+    "communication coach",
+    "dating AI",
+    "relationship help",
+    "DARC AI"
+  ],
+  authors: [{ name: "DARC Team" }],
+  creator: "DARC Team",
+  publisher: "DARC",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "DARC | AI Dating & Relationship Coach",
+    description: "Get expert, personalized relationship advice, communication tips, and dating guidance instantly with DARC, your AI coach.",
+    url: "https://darc.fun",
+    siteName: "DARC",
+    locale: "en_US",
+    type: "website",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "DARC | AI Dating & Relationship Coach",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "DARC | AI Dating & Relationship Coach",
+    description: "Get expert, personalized relationship advice, communication tips, and dating guidance instantly with DARC, your AI coach.",
+    images: ["/og-image.png"],
+    creator: "@darc_ai",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico" },
@@ -36,18 +95,10 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#131314]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#131314] text-[#e3e3e3]`}
       >
-        <ChatProvider>
-          <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden">
-            <Sidebar />
-            <main className="flex-1 relative overflow-hidden bg-[#131314]">
-              {children}
-            </main>
-          </div>
-        </ChatProvider>
+        {children}
       </body>
     </html>
   );
 }
-
