@@ -66,7 +66,7 @@ export function ChatProvider({ children }: { children: React.ReactNode }) {
     useEffect(() => {
         refreshChats();
         refreshLimitStats();
-    }, [session]);
+    }, [session?.user?.id]);
 
     return (
         <ChatContext.Provider value={{ 

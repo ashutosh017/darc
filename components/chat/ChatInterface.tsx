@@ -45,7 +45,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         }
       });
     }
-  }, [session]);
+  }, [session?.user?.id]);
   
   const scrollRef = useRef<HTMLDivElement>(null);
   const skipNextFetchRef = useRef(false);
@@ -267,7 +267,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     return () => {
       active = false;
     };
-  }, [localChatId, session]);
+  }, [localChatId, session?.user?.id]);
 
   // Handle message parameter passed during redirect
   const initMsg = searchParams?.get("msg");

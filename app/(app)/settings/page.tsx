@@ -121,7 +121,7 @@ export default function SettingsPage() {
         .catch((err) => console.error("Failed to load user profile:", err))
         .finally(() => setIsLoading(false));
     }
-  }, [session]);
+  }, [session?.user?.id]);
 
   // Dynamically update max days and selected day if needed for DOB
   useEffect(() => {
