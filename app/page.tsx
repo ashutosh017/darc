@@ -383,7 +383,7 @@ export default async function LandingPage() {
           </p>
           <Link 
             href="/chat" 
-            className="inline-flex items-center justify-center px-10 py-5 text-lg font-bold text-black bg-white rounded-full hover:bg-zinc-100 shadow-xl transition-all active:scale-[0.98]"
+            className="inline-flex items-center justify-center w-full sm:w-auto px-6 py-4 sm:px-10 sm:py-5 text-base sm:text-lg font-bold text-black bg-white rounded-full hover:bg-zinc-100 shadow-xl transition-all active:scale-[0.98]"
           >
             Get Started Now — It's Free
             <ArrowRight className="w-5 h-5 ml-2" />
