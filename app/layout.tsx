@@ -18,7 +18,8 @@ export const metadata: Metadata = {
     default: "DARC | AI Dating & Relationship Coach",
     template: "%s | DARC",
   },
-  description: "DARC is your personal AI Dating and Relationship Coach. Get expert, personalized relationship advice, communication tips, and dating guidance instantly.",
+  description:
+    "DARC is your personal AI Dating and Relationship Coach. Get expert, personalized relationship advice, communication tips, and dating guidance instantly.",
   keywords: [
     "dating coach",
     "relationship advice",
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
     "communication coach",
     "dating AI",
     "relationship help",
-    "DARC AI"
+    "DARC AI",
   ],
   authors: [{ name: "DARC Team" }],
   creator: "DARC Team",
@@ -44,14 +45,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "DARC | AI Dating & Relationship Coach",
-    description: "Get expert, personalized relationship advice, communication tips, and dating guidance instantly with DARC, your AI coach.",
+    description:
+      "Get expert, personalized relationship advice, communication tips, and dating guidance instantly with DARC, your AI coach.",
     url: "https://darc.fun",
     siteName: "DARC",
     locale: "en_US",
     type: "website",
     images: [
       {
-        url: "/og-image.png",
+        url: "/darc_opengraph_image.png",
         width: 1200,
         height: 630,
         alt: "DARC | AI Dating & Relationship Coach",
@@ -61,8 +63,9 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "DARC | AI Dating & Relationship Coach",
-    description: "Get expert, personalized relationship advice, communication tips, and dating guidance instantly with DARC, your AI coach.",
-    images: ["/og-image.png"],
+    description:
+      "Get expert, personalized relationship advice, communication tips, and dating guidance instantly with DARC, your AI coach.",
+    images: ["/darc_opengraph_image.png"],
     creator: "@darc_ai",
   },
   robots: {
@@ -95,7 +98,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#131314] text-[#e3e3e3]`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#0C0A09] text-stone-50`}
       >
         {children}
       </body>

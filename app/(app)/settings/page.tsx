@@ -237,17 +237,17 @@ export default function SettingsPage() {
 
   if (isSessionPending || !session) {
     return (
-      <div className="flex flex-col items-center justify-center h-full bg-[#131314] text-[#e3e3e3]">
-        <Loader2 className="w-8 h-8 text-[#8ab4f8] animate-spin mb-3" />
+      <div className="flex flex-col items-center justify-center h-full bg-[#0C0A09] text-stone-50">
+        <Loader2 className="w-8 h-8 text-amber-500 animate-spin mb-3" />
         <span className="text-sm text-zinc-500">Loading settings...</span>
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-[#131314] text-[#e3e3e3] overflow-y-auto px-4 md:px-8 py-8">
+    <div className="h-full bg-[#0C0A09] text-stone-50 overflow-y-auto px-4 md:px-8 py-8">
       {/* Decorative background glows */}
-      <div className="absolute top-0 right-0 w-96 h-96 bg-[#8ab4f8]/5 opacity-20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/5 opacity-20 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#d96570]/5 opacity-20 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-4xl mx-auto space-y-8 relative z-10">
@@ -261,10 +261,10 @@ export default function SettingsPage() {
         </button>
 
         {/* Title */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#3c4043]/30 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-stone-800/30 pb-6">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#1e1f20] border border-[#3c4043]/30 flex items-center justify-center shadow-lg">
-              <Settings size={24} className="text-[#8ab4f8]" />
+            <div className="w-12 h-12 rounded-2xl bg-[#1C1917] border border-stone-800/30 flex items-center justify-center shadow-lg">
+              <Settings size={24} className="text-amber-500" />
             </div>
             <div>
               <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
@@ -276,14 +276,14 @@ export default function SettingsPage() {
             <button
               onClick={() => router.back()}
               disabled={isSaving}
-              className="px-4 py-2 border border-[#3c4043]/30 text-zinc-300 hover:text-white rounded-xl text-sm font-semibold transition-all hover:bg-white/5 disabled:opacity-50"
+              className="px-4 py-2 border border-stone-800/30 text-zinc-300 hover:text-white rounded-xl text-sm font-semibold transition-all hover:bg-white/5 disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               onClick={handleSave}
               disabled={isSaving || saveSuccess}
-              className={`flex items-center gap-1.5 px-5 py-2 text-white rounded-xl text-sm font-bold transition-all active:scale-[0.98] ${saveSuccess ? "bg-emerald-600 hover:bg-emerald-600" : "bg-gradient-to-tr from-[#4285f4] to-[#9b72cb] hover:shadow-lg"} disabled:opacity-50`}
+              className={`flex items-center gap-1.5 px-5 py-2 text-white rounded-xl text-sm font-bold transition-all active:scale-[0.98] ${saveSuccess ? "bg-emerald-600 hover:bg-emerald-600" : "bg-gradient-to-tr from-amber-500 to-rose-500 hover:shadow-lg"} disabled:opacity-50`}
             >
               {isSaving ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -298,24 +298,24 @@ export default function SettingsPage() {
         {/* Dashboard Grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           {/* Left Tab Navigation */}
-          <div className="md:col-span-1 flex flex-col gap-1.5 bg-[#1e1f20]/50 p-2 border border-[#3c4043]/20 rounded-2xl h-fit">
+          <div className="md:col-span-1 flex flex-col gap-1.5 bg-[#1C1917]/50 p-2 border border-stone-800/20 rounded-2xl h-fit">
             <button 
               onClick={() => setActiveTab("personal")}
-              className={`flex items-center gap-2.5 px-4 py-3 text-sm font-semibold rounded-xl text-left transition-all cursor-pointer ${activeTab === "personal" ? "bg-[#e3e3e3] text-[#131314] shadow-md" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
+              className={`flex items-center gap-2.5 px-4 py-3 text-sm font-semibold rounded-xl text-left transition-all cursor-pointer ${activeTab === "personal" ? "bg-stone-50 text-[#0C0A09] shadow-md" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
             >
               <UserIcon size={16} />
               <span>Personal Info</span>
             </button>
             <button 
               onClick={() => setActiveTab("career")}
-              className={`flex items-center gap-2.5 px-4 py-3 text-sm font-semibold rounded-xl text-left transition-all cursor-pointer ${activeTab === "career" ? "bg-[#e3e3e3] text-[#131314] shadow-md" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
+              className={`flex items-center gap-2.5 px-4 py-3 text-sm font-semibold rounded-xl text-left transition-all cursor-pointer ${activeTab === "career" ? "bg-stone-50 text-[#0C0A09] shadow-md" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
             >
               <GraduationCap size={16} />
               <span>Career & Edu</span>
             </button>
             <button 
               onClick={() => setActiveTab("socials")}
-              className={`flex items-center gap-2.5 px-4 py-3 text-sm font-semibold rounded-xl text-left transition-all cursor-pointer ${activeTab === "socials" ? "bg-[#e3e3e3] text-[#131314] shadow-md" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
+              className={`flex items-center gap-2.5 px-4 py-3 text-sm font-semibold rounded-xl text-left transition-all cursor-pointer ${activeTab === "socials" ? "bg-stone-50 text-[#0C0A09] shadow-md" : "text-zinc-400 hover:bg-white/5 hover:text-white"}`}
             >
               <Camera size={16} />
               <span>Social Links</span>
@@ -323,10 +323,10 @@ export default function SettingsPage() {
           </div>
 
           {/* Right Form Container */}
-          <div className="md:col-span-3 bg-[#1e1f20] border border-[#3c4043]/30 rounded-3xl p-6 md:p-8 shadow-xl min-h-[380px]">
+          <div className="md:col-span-3 bg-[#1C1917] border border-stone-800/30 rounded-3xl p-6 md:p-8 shadow-xl min-h-[380px]">
             {isLoading ? (
               <div className="flex flex-col items-center justify-center py-20 gap-3">
-                <Loader2 className="w-8 h-8 text-[#8ab4f8] animate-spin" />
+                <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
                 <span className="text-sm text-zinc-500 font-medium">Loading details...</span>
               </div>
             ) : (
@@ -334,7 +334,7 @@ export default function SettingsPage() {
                 {/* Personal Info Tab */}
                 {activeTab === "personal" && (
                   <div className="space-y-5">
-                    <h3 className="text-lg font-bold text-white border-b border-[#3c4043]/20 pb-2">Personal Details</h3>
+                    <h3 className="text-lg font-bold text-white border-b border-stone-800/20 pb-2">Personal Details</h3>
                     
                     {/* Date of Birth */}
                     <div>
@@ -346,11 +346,11 @@ export default function SettingsPage() {
                           <select
                             value={selectedMonth}
                             onChange={(e) => setSelectedMonth(e.target.value)}
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                           >
-                            <option value="" className="bg-[#1e1f20] text-zinc-500">Month</option>
+                            <option value="" className="bg-[#1C1917] text-zinc-500">Month</option>
                             {months.map((m) => (
-                              <option key={m.value} value={m.value} className="bg-[#1e1f20] text-[#e3e3e3]">
+                              <option key={m.value} value={m.value} className="bg-[#1C1917] text-stone-50">
                                 {m.label}
                               </option>
                             ))}
@@ -364,11 +364,11 @@ export default function SettingsPage() {
                           <select
                             value={selectedDay}
                             onChange={(e) => setSelectedDay(e.target.value)}
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                           >
-                            <option value="" className="bg-[#1e1f20] text-zinc-500">Day</option>
+                            <option value="" className="bg-[#1C1917] text-zinc-500">Day</option>
                             {days.map((d) => (
-                              <option key={d} value={d} className="bg-[#1e1f20] text-[#e3e3e3]">
+                              <option key={d} value={d} className="bg-[#1C1917] text-stone-50">
                                 {parseInt(d, 10)}
                               </option>
                             ))}
@@ -382,11 +382,11 @@ export default function SettingsPage() {
                           <select
                             value={selectedYear}
                             onChange={(e) => setSelectedYear(e.target.value)}
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                           >
-                            <option value="" className="bg-[#1e1f20] text-zinc-500">Year</option>
+                            <option value="" className="bg-[#1C1917] text-zinc-500">Year</option>
                             {years.map((y) => (
-                              <option key={y} value={y} className="bg-[#1e1f20] text-[#e3e3e3]">
+                              <option key={y} value={y} className="bg-[#1C1917] text-stone-50">
                                 {y}
                               </option>
                             ))}
@@ -416,13 +416,13 @@ export default function SettingsPage() {
                           }}
                           onFocus={() => setShowSuggestions(true)}
                           placeholder="e.g. San Francisco, CA"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                         {showSuggestions && (suggestions.length > 0 || isLoadingSuggestions) && (
-                          <div className="absolute left-0 right-0 top-full mt-1 bg-[#1e1f20] border border-[#3c4043]/40 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
+                          <div className="absolute left-0 right-0 top-full mt-1 bg-[#1C1917] border border-stone-800/40 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
                             {isLoadingSuggestions ? (
                               <div className="p-3 text-xs text-zinc-500 text-center flex items-center justify-center gap-2">
-                                <div className="w-3.5 h-3.5 border-2 border-t-transparent border-[#8ab4f8] rounded-full animate-spin" />
+                                <div className="w-3.5 h-3.5 border-2 border-t-transparent border-amber-500 rounded-full animate-spin" />
                                 Searching locations...
                               </div>
                             ) : (
@@ -434,7 +434,7 @@ export default function SettingsPage() {
                                     setLocation(suggestion);
                                     setShowSuggestions(false);
                                   }}
-                                  className="w-full text-left px-4 py-2.5 text-xs text-[#e3e3e3] hover:bg-white/5 hover:text-white transition-colors border-b border-[#3c4043]/10 last:border-0"
+                                  className="w-full text-left px-4 py-2.5 text-xs text-stone-50 hover:bg-white/5 hover:text-white transition-colors border-b border-stone-800/10 last:border-0"
                                 >
                                   {suggestion}
                                 </button>
@@ -459,7 +459,7 @@ export default function SettingsPage() {
                           value={datingGoals}
                           onChange={(e) => setDatingGoals(e.target.value)}
                           placeholder="e.g. Looking for marriage, self-discovery..."
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
                     </div>
@@ -478,7 +478,7 @@ export default function SettingsPage() {
                           onChange={(e) => setSeekingReason(e.target.value)}
                           placeholder="e.g. Navigating relationship milestones..."
                           rows={3}
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] resize-none"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 resize-none"
                         />
                       </div>
                     </div>
@@ -488,7 +488,7 @@ export default function SettingsPage() {
                 {/* Career & Education Tab */}
                 {activeTab === "career" && (
                   <div className="space-y-5">
-                    <h3 className="text-lg font-bold text-white border-b border-[#3c4043]/20 pb-2">Education & Career</h3>
+                    <h3 className="text-lg font-bold text-white border-b border-stone-800/20 pb-2">Education & Career</h3>
                     
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
@@ -504,7 +504,7 @@ export default function SettingsPage() {
                             value={educationSchool}
                             onChange={(e) => setEducationSchool(e.target.value)}
                             placeholder="School / College"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -518,7 +518,7 @@ export default function SettingsPage() {
                           value={educationDegree}
                           onChange={(e) => setEducationDegree(e.target.value)}
                           placeholder="Degree / Field"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
                     </div>
@@ -533,7 +533,7 @@ export default function SettingsPage() {
                           value={educationYear}
                           onChange={(e) => setEducationYear(e.target.value)}
                           placeholder="e.g. 2024"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
 
@@ -550,7 +550,7 @@ export default function SettingsPage() {
                             value={employmentDetails}
                             onChange={(e) => setEmploymentDetails(e.target.value)}
                             placeholder="e.g. Engineer, Manager..."
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -569,7 +569,7 @@ export default function SettingsPage() {
                           value={annualIncome}
                           onChange={(e) => setAnnualIncome(e.target.value)}
                           placeholder="e.g. $100k - $120k"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
                     </div>
@@ -579,7 +579,7 @@ export default function SettingsPage() {
                 {/* Social Links Tab */}
                 {activeTab === "socials" && (
                   <div className="space-y-5">
-                    <h3 className="text-lg font-bold text-white border-b border-[#3c4043]/20 pb-2">Social Profiles</h3>
+                    <h3 className="text-lg font-bold text-white border-b border-stone-800/20 pb-2">Social Profiles</h3>
                     
                     <div>
                       <label className="text-xs font-bold uppercase tracking-wider text-zinc-500 mb-1.5 block">
@@ -594,7 +594,7 @@ export default function SettingsPage() {
                           value={instaUrl}
                           onChange={(e) => setInstaUrl(e.target.value)}
                           placeholder="Instagram Profile URL / Username"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
                     </div>
@@ -612,7 +612,7 @@ export default function SettingsPage() {
                           value={linkedinUrl}
                           onChange={(e) => setLinkedinUrl(e.target.value)}
                           placeholder="LinkedIn Profile URL"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
                     </div>
@@ -630,7 +630,7 @@ export default function SettingsPage() {
                           value={xUrl}
                           onChange={(e) => setXUrl(e.target.value)}
                           placeholder="X (Twitter) Profile URL / Username"
-                          className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                          className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                         />
                       </div>
                     </div>

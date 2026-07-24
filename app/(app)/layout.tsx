@@ -10,7 +10,7 @@ export default function AppLayout({
     <ChatProvider>
       <div className="flex flex-col md:flex-row h-screen w-full overflow-hidden">
         <Sidebar />
-        <main className="flex-1 relative overflow-hidden bg-[#131314]">
+        <main className="flex-1 relative overflow-hidden bg-[#0C0A09]">
           {children}
         </main>
       </div>

@@ -11,9 +11,16 @@ import { SignInModal } from "@/components/SignInModal";
 import { AnimatePresence, motion } from "framer-motion";
 import { AlertCircle } from "lucide-react";
 import { useSession } from "@/lib/auth-client";
-import { saveMessage, getChatMessages, createChat, checkProfilePrompted, getUserDailyLimitStats, deleteMessage } from "@/app/actions";
+import {
+  saveMessage,
+  getChatMessages,
+  createChat,
+  checkProfilePrompted,
+  getUserDailyLimitStats,
+  deleteMessage,
+} from "@/app/actions";
 import { useChat } from "@/lib/chat-context";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ProfilePromptModal } from "@/components/ProfilePromptModal";
 
 interface Message {
@@ -24,16 +31,22 @@ interface Message {
 }
 
 export function ChatInterface({ chatId }: { chatId: string | null }) {
+  const router = useRouter();
   const { data: session, isPending: isSessionPending } = useSession();
-  const { setCurrentChatId, refreshChats, refreshLimitStats, limitStats } = useChat();
-  
+  const { setCurrentChatId, refreshChats, refreshLimitStats, limitStats } =
+    useChat();
+
   // Track the current chat ID locally to support seamless transitions
-  const [localChatId, setLocalChatId] = useState<string | null>(chatId);
-  
+  const [localChatId, setLocalChatId] = useState<string | null>(
+    chatId === "undefined" || chatId === "null" ? null : chatId
+  );
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [isLoadingMessages, setIsLoadingMessages] = useState(chatId !== null);
+  const [isLoadingMessages, setIsLoadingMessages] = useState(
+    chatId !== null && chatId !== "undefined" && chatId !== "null"
+  );
   const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Check if user should be prompted for profile details
@@ -46,191 +59,214 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       });
     }
   }, [session?.user?.id]);
-  
+
   const scrollRef = useRef<HTMLDivElement>(null);
   const skipNextFetchRef = useRef(false);
   const searchParams = useSearchParams();
 
   // Sync localChatId when the chatId prop changes
   useEffect(() => {
-    setLocalChatId(chatId);
-    if (chatId !== null) {
+    const cleanId = chatId === "undefined" || chatId === "null" ? null : chatId;
+    setLocalChatId(cleanId);
+    if (cleanId !== null) {
       setIsLoadingMessages(true);
     }
   }, [chatId]);
 
-  const handleSendMessage = useCallback(async (content: string) => {
-    if (!content.trim()) return;
-    
-    if (!session) {
-      return;
-    }
+  const handleSendMessage = useCallback(
+    async (content: string) => {
+      if (!content.trim()) return;
 
-    if (limitStats && limitStats.chatsUsed >= limitStats.dailyLimit) {
-      return;
-    }
-
-    // Authoritative check against the DB before starting mutations
-    const freshStats = await getUserDailyLimitStats();
-    if (freshStats && freshStats.chatsUsed >= freshStats.dailyLimit) {
-      await refreshLimitStats();
-      return;
-    }
-
-    setError(null);
-    let activeChatId = localChatId;
-
-    // Create a temporary ID for the user message to show it immediately
-    const userMessageId = "temp-user-" + Date.now();
-    const userMessage: Message = {
-      id: userMessageId,
-      role: "USER",
-      text: content
-    };
-
-    setMessages((prev) => [...prev, userMessage]);
-    setIsTyping(true);
-
-    let savedUserMsgId: string | null = null;
-    try {
-      // 1. Create chat if it doesn't exist (i.e. on the landing page)
-      if (!activeChatId) {
-        const newChat = await createChat(content.slice(0, 30) + "...");
-        activeChatId = newChat.id;
-        skipNextFetchRef.current = true; // Prevent clearing/reloading messages on local ID update
-        setLocalChatId(activeChatId);
+      if (!session) {
+        return;
       }
 
-      // 2. Save User Message to DB
-      const userMsg = await saveMessage(activeChatId, content, "USER");
-      savedUserMsgId = userMsg.id;
-      
-      // Update temporary user message with actual DB ID
-      setMessages((prev) => 
-        prev.map((msg) => 
-          msg.id === userMessageId 
-            ? { ...msg, id: userMsg.id } 
-            : msg
-        )
-      );
-
-      // 3. Hit chat API with message and chatId
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ message: content, chatId: activeChatId }),
-      });
-
-      if (!response.ok) {
-        let errMsg = "Connection interrupted. Please try rephrasing your relationship query.";
-        let isLimitReached = false;
-        try {
-          const data = await response.json();
-          if (data && data.error) {
-            errMsg = data.error;
-            if (response.status === 403 || errMsg.toLowerCase().includes("daily limit") || errMsg.toLowerCase().includes("limit reached")) {
-              isLimitReached = true;
-            }
-          }
-        } catch {
-          // ignore
-        }
-
-        if (isLimitReached) {
-          // Remove user message from database
-          if (savedUserMsgId) {
-            await deleteMessage(savedUserMsgId);
-          }
-          // Remove user message from UI list
-          setMessages((prev) => prev.filter((msg) => msg.id !== savedUserMsgId && msg.id !== userMessageId));
-          await refreshLimitStats();
-          setIsTyping(false);
-          return; // Exit silently
-        }
-
-        throw new Error(errMsg);
+      if (limitStats && limitStats.chatsUsed >= limitStats.dailyLimit) {
+        return;
       }
 
-      // Refresh daily limit usage stats immediately
-      refreshLimitStats();
+      // Authoritative check against the DB before starting mutations
+      const freshStats = await getUserDailyLimitStats();
+      if (freshStats && freshStats.chatsUsed >= freshStats.dailyLimit) {
+        await refreshLimitStats();
+        return;
+      }
 
-      const coachMessageId = "temp-" + Date.now();
-      const coachMessage: Message = {
-        id: coachMessageId,
-        role: "DARC",
-        text: "",
-        isComplete: false
+      setError(null);
+      let activeChatId = localChatId;
+
+      // Create a temporary ID for the user message to show it immediately
+      const userMessageId = "temp-user-" + Date.now();
+      const userMessage: Message = {
+        id: userMessageId,
+        role: "USER",
+        text: content,
       };
 
-      setMessages((prev) => [...prev, coachMessage]);
-      setIsTyping(false);
+      setMessages((prev) => [...prev, userMessage]);
+      setIsTyping(true);
 
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder();
-      
-      if (!reader) throw new Error("No reader available");
+      let savedUserMsgId: string | null = null;
+      try {
+        // 1. Create chat if it doesn't exist (i.e. on the landing page)
+        if (!activeChatId) {
+          const newChat = await createChat(content.slice(0, 30) + "...");
+          activeChatId = newChat.id;
+          skipNextFetchRef.current = true; // Prevent clearing/reloading messages on local ID update
+          setLocalChatId(activeChatId);
+        }
 
-      let fullCoachText = "";
-      while (true) {
-        const { value, done: doneReading } = await reader.read();
-        if (doneReading) break;
+        // 2. Save User Message to DB
+        const userMsg = await saveMessage(activeChatId, content, "USER");
+        savedUserMsgId = userMsg.id;
 
-        const chunkValue = decoder.decode(value, { stream: true });
-        fullCoachText += chunkValue;
-        
-        setMessages((prev) => 
-          prev.map((msg) => 
-            msg.id === coachMessageId 
-              ? { ...msg, text: msg.text + chunkValue } 
-              : msg
-          )
+        // Update temporary user message with actual DB ID
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === userMessageId ? { ...msg, id: userMsg.id } : msg,
+          ),
         );
-      }
 
-      // 4. Save Coach Message to DB
-      const savedCoachMsg = await saveMessage(activeChatId, fullCoachText, "DARC");
+        // 3. Hit chat API with message and chatId
+        const response = await fetch("/api/chat/v1", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ message: content, chatId: activeChatId }),
+        });
 
-      setMessages((prev) => 
-        prev.map((msg) => 
-          msg.id === coachMessageId 
-            ? { ...msg, id: savedCoachMsg.id, isComplete: true } 
-            : msg
-        )
-      );
-
-      // 5. If we started on the landing page (chatId was null), update the URL in-place without triggering Next.js page reload/unmount
-      if (!chatId) {
-        await refreshChats();
-        const newUrl = `/chat/${activeChatId}`;
-        window.history.replaceState(
-          { ...window.history.state, as: newUrl, url: newUrl },
-          "",
-          newUrl
-        );
-      }
-    } catch (err: unknown) {
-      console.error("[DARC Error]", err);
-      const errorMessage = err instanceof Error ? err.message : "Connection interrupted.";
-      // Do not show error on frontend if it mentions daily limit/rate limit
-      if (errorMessage.toLowerCase().includes("daily limit") || errorMessage.toLowerCase().includes("limit reached")) {
-        // Safe-guard to remove user message if it was somehow saved but failed later
-        if (savedUserMsgId) {
+        if (!response.ok) {
+          let errMsg =
+            "Connection interrupted. Please try rephrasing your relationship query.";
+          let isLimitReached = false;
           try {
-            await deleteMessage(savedUserMsgId);
+            const data = await response.json();
+            if (data && data.error) {
+              errMsg = data.error;
+              if (
+                response.status === 403 ||
+                errMsg.toLowerCase().includes("daily limit") ||
+                errMsg.toLowerCase().includes("limit reached")
+              ) {
+                isLimitReached = true;
+              }
+            }
           } catch {
             // ignore
           }
+
+          if (isLimitReached) {
+            // Remove user message from database
+            if (savedUserMsgId) {
+              await deleteMessage(savedUserMsgId);
+            }
+            // Remove user message from UI list
+            setMessages((prev) =>
+              prev.filter(
+                (msg) => msg.id !== savedUserMsgId && msg.id !== userMessageId,
+              ),
+            );
+            await refreshLimitStats();
+            setIsTyping(false);
+            return; // Exit silently
+          }
+
+          throw new Error(errMsg);
         }
-        setMessages((prev) => prev.filter((msg) => msg.id !== savedUserMsgId && msg.id !== userMessageId));
-        await refreshLimitStats();
-      } else {
-        setError(errorMessage);
+
+        // Refresh daily limit usage stats immediately
+        refreshLimitStats();
+
+        const coachMessageId = "temp-" + Date.now();
+        const coachMessage: Message = {
+          id: coachMessageId,
+          role: "DARC",
+          text: "",
+          isComplete: false,
+        };
+
+        setMessages((prev) => [...prev, coachMessage]);
+        setIsTyping(false);
+
+        const reader = response.body?.getReader();
+        const decoder = new TextDecoder();
+
+        if (!reader) throw new Error("No reader available");
+
+        let fullCoachText = "";
+        while (true) {
+          const { value, done: doneReading } = await reader.read();
+          if (doneReading) break;
+
+          const chunkValue = decoder.decode(value, { stream: true });
+          fullCoachText += chunkValue;
+
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === coachMessageId
+                ? { ...msg, text: msg.text + chunkValue }
+                : msg,
+            ),
+          );
+        }
+
+        // 4. Save Coach Message to DB
+        const savedCoachMsg = await saveMessage(
+          activeChatId,
+          fullCoachText,
+          "DARC",
+        );
+
+        setMessages((prev) =>
+          prev.map((msg) =>
+            msg.id === coachMessageId
+              ? { ...msg, id: savedCoachMsg.id, isComplete: true }
+              : msg,
+          ),
+        );
+
+        // 5. If we started on the landing page (chatId was null), update the URL in-place without triggering Next.js page reload/unmount
+        if (!chatId) {
+          await refreshChats();
+          const newUrl = `/chat/${activeChatId}`;
+          window.history.replaceState(
+            { ...window.history.state, as: newUrl, url: newUrl },
+            "",
+            newUrl,
+          );
+        }
+      } catch (err: unknown) {
+        console.error("[DARC Error]", err);
+        const errorMessage =
+          err instanceof Error ? err.message : "Connection interrupted.";
+        // Do not show error on frontend if it mentions daily limit/rate limit
+        if (
+          errorMessage.toLowerCase().includes("daily limit") ||
+          errorMessage.toLowerCase().includes("limit reached")
+        ) {
+          // Safe-guard to remove user message if it was somehow saved but failed later
+          if (savedUserMsgId) {
+            try {
+              await deleteMessage(savedUserMsgId);
+            } catch {
+              // ignore
+            }
+          }
+          setMessages((prev) =>
+            prev.filter(
+              (msg) => msg.id !== savedUserMsgId && msg.id !== userMessageId,
+            ),
+          );
+          await refreshLimitStats();
+        } else {
+          setError(errorMessage);
+        }
+        setIsTyping(false);
       }
-      setIsTyping(false);
-    }
-  }, [chatId, localChatId, session, refreshChats, refreshLimitStats, limitStats]);
+    },
+    [chatId, localChatId, session, refreshChats, refreshLimitStats, limitStats],
+  );
 
   // Set current chat ID for sidebar highlighting
   useEffect(() => {
@@ -247,17 +283,26 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     }
     if (localChatId && session) {
       setIsLoadingMessages(true);
-      getChatMessages(localChatId).then((msgs) => {
-        if (active) {
-          setMessages(msgs.map(m => ({
-            id: m.id,
-            role: m.role as "USER" | "DARC",
-            text: m.text,
-            isComplete: true
-          })));
-          setIsLoadingMessages(false);
-        }
-      });
+      getChatMessages(localChatId)
+        .then((msgs) => {
+          if (active) {
+            setMessages(
+              msgs.map((m) => ({
+                id: m.id,
+                role: m.role as "USER" | "DARC",
+                text: m.text,
+                isComplete: true,
+              })),
+            );
+            setIsLoadingMessages(false);
+          }
+        })
+        .catch((err) => {
+          console.error("[getChatMessages] Error loading messages:", err);
+          if (active) {
+            router.push("/chat");
+          }
+        });
     } else {
       if (active) {
         setMessages([]);
@@ -267,7 +312,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     return () => {
       active = false;
     };
-  }, [localChatId, session?.user?.id]);
+  }, [localChatId, session?.user?.id, router]);
 
   // Handle message parameter passed during redirect
   const initMsg = searchParams?.get("msg");
@@ -284,7 +329,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     if (scrollRef.current) {
       scrollRef.current.scrollTo({
         top: scrollRef.current.scrollHeight,
-        behavior: "smooth"
+        behavior: "smooth",
       });
     }
   };
@@ -296,37 +341,40 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   if (isSessionPending) return null;
 
   return (
-    <div className="flex flex-col h-full bg-[#131314] text-[#e3e3e3]">
+    <div className="flex flex-col h-full bg-[#0C0A09] text-stone-50">
       <MobileHeader />
-      
+
       {!session && <SignInModal />}
       {session && (
-        <ProfilePromptModal 
-          isOpen={showOnboarding} 
-          onClose={() => setShowOnboarding(false)} 
+        <ProfilePromptModal
+          isOpen={showOnboarding}
+          onClose={() => setShowOnboarding(false)}
         />
       )}
-      
+
       <div className="flex-1 relative overflow-hidden">
-        <div 
+        <div
           ref={scrollRef}
           className="h-full overflow-y-auto scrollbar-hide px-4 md:px-0"
         >
           <div className="max-w-3xl mx-auto pt-8 pb-8 md:pt-12">
             <AnimatePresence mode="popLayout">
               {isLoadingMessages ? (
-                <div key="loading" className="flex items-center justify-center py-20">
-                  <div className="w-8 h-8 border-4 border-t-transparent border-[#e3e3e3] rounded-full animate-spin" />
+                <div
+                  key="loading"
+                  className="flex items-center justify-center py-20"
+                >
+                  <div className="w-8 h-8 border-4 border-t-transparent border-stone-50 rounded-full animate-spin" />
                 </div>
               ) : messages.length === 0 ? (
                 <ChatHero key="hero" />
               ) : (
                 <div key="messages" className="flex flex-col">
                   {messages.map((message) => (
-                    <ChatMessage 
-                      key={message.id} 
-                      role={message.role === "USER" ? "user" : "coach"} 
-                      content={message.text} 
+                    <ChatMessage
+                      key={message.id}
+                      role={message.role === "USER" ? "user" : "coach"}
+                      content={message.text}
                       isComplete={message.isComplete}
                     />
                   ))}
@@ -334,14 +382,14 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
                 </div>
               )}
             </AnimatePresence>
-            
+
             <AnimatePresence>
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95 }}
-                  className="mt-6 p-4 rounded-2xl bg-[#f28b82]/10 border border-[#f28b82]/20 flex items-center gap-3 text-[#f28b82]"
+                  className="mt-6 p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 flex items-center gap-3 text-rose-500"
                 >
                   <AlertCircle className="w-5 h-5 shrink-0" />
                   <p className="text-sm font-medium">{error}</p>
@@ -353,18 +401,29 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       </div>
 
       {session && (
-        <div className="relative z-20 pb-2 md:pb-6 bg-gradient-to-t from-[#131314] via-[#131314] to-transparent pt-8">
+        <div className="relative z-20 pb-2 md:pb-6 bg-gradient-to-t from-[#0C0A09] via-[#0C0A09] to-transparent pt-8">
           {limitStats && limitStats.chatsUsed >= limitStats.dailyLimit && (
             <div className="max-w-3xl mx-auto px-4 mb-3">
               <div className="py-2.5 px-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs text-zinc-400 text-center flex items-center justify-center gap-2">
-                <span>🔒 You've used all your {limitStats.dailyLimit} free prompts for today. Your daily limit resets tomorrow.</span>
+                <span>
+                  🔒 You&apos;ve used all your {limitStats.dailyLimit} free
+                  prompts for today. Your daily limit resets tomorrow.
+                </span>
               </div>
             </div>
           )}
-          <ChatInput 
-            onSendMessage={handleSendMessage} 
-            disabled={isTyping || (limitStats !== null && limitStats.chatsUsed >= limitStats.dailyLimit)} 
-            placeholder={limitStats && limitStats.chatsUsed >= limitStats.dailyLimit ? "Daily limit reached. Let's continue tomorrow!" : "Ask DARC..."}
+          <ChatInput
+            onSendMessage={handleSendMessage}
+            disabled={
+              isTyping ||
+              (limitStats !== null &&
+                limitStats.chatsUsed >= limitStats.dailyLimit)
+            }
+            placeholder={
+              limitStats && limitStats.chatsUsed >= limitStats.dailyLimit
+                ? "Daily limit reached. Let's continue tomorrow!"
+                : "Ask DARC..."
+            }
           />
         </div>
       )}

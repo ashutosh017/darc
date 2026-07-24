@@ -37,10 +37,10 @@ export function ChatInput({ onSendMessage, disabled, placeholder }: ChatInputPro
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pb-4">
-      <div className="relative flex flex-col bg-[#1e1f20] rounded-[32px] p-2 transition-all duration-300 shadow-lg border border-transparent">
+      <div className="relative flex flex-col bg-stone-900 rounded-[32px] p-2 transition-all duration-300 shadow-lg border border-transparent focus-within:border-amber-500/50 focus-within:ring-1 focus-within:ring-amber-500/20">
         <div className="flex items-end gap-2 px-2">
           {/* Optional: Add a plus or upload button like Gemini */}
-          {/* <button className="p-3 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors mb-1">
+          {/* <button className="p-3 text-stone-400 hover:text-stone-50 hover:bg-stone-800 rounded-full transition-colors mb-1">
             <Plus size={20} />
           </button> */}
           
@@ -52,11 +52,11 @@ export function ChatInput({ onSendMessage, disabled, placeholder }: ChatInputPro
             onKeyDown={handleKeyDown}
             placeholder={placeholder || "Ask DARC..."}
             disabled={disabled}
-            className="w-full bg-transparent border-none focus:ring-0 outline-none text-[#e3e3e3] resize-none py-3 px-4 max-h-[200px] overflow-y-auto scrollbar-hide text-[16px] leading-relaxed placeholder:text-[#b4b4b4]"
+            className="w-full bg-transparent border-none focus:ring-0 outline-none text-stone-50 resize-none py-3 px-4 max-h-[200px] overflow-y-auto scrollbar-hide text-[16px] leading-relaxed placeholder:text-stone-500"
           />
           
           <div className="flex items-center gap-1 mb-1.5">
-            {/* <button className="p-3 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors">
+            {/* <button className="p-3 text-stone-400 hover:text-stone-50 hover:bg-stone-800 rounded-full transition-colors">
               <Mic size={20} />
             </button> */}
             <button
@@ -65,8 +65,8 @@ export function ChatInput({ onSendMessage, disabled, placeholder }: ChatInputPro
               className={cn(
                 "p-3 rounded-full transition-all duration-300",
                 message.trim() && !disabled
-                  ? "bg-[#e3e3e3] text-[#131314] hover:bg-white scale-100"
-                  : "bg-transparent text-[#3c4043] cursor-not-allowed"
+                  ? "bg-amber-500 text-[#0C0A09] hover:bg-amber-400 scale-100"
+                  : "bg-transparent text-stone-700 cursor-not-allowed"
               )}
             >
               <ArrowUp size={20} />
@@ -74,7 +74,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder }: ChatInputPro
           </div>
         </div>
       </div>
-      <p className="text-center text-[11px] text-[#b4b4b4] mt-3 px-4">
+      <p className="text-center text-[11px] text-stone-500 mt-3 px-4">
         DARC may display inaccurate info, so double-check its coaching insights.
       </p>
     </div>

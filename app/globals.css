@@ -12,19 +12,19 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #131314;
+  --foreground: #0C0A09;
   --card: #ffffff;
-  --card-foreground: #131314;
+  --card-foreground: #0C0A09;
   --popover: #ffffff;
-  --popover-foreground: #131314;
-  --primary: #131314;
+  --popover-foreground: #0C0A09;
+  --primary: #0C0A09;
   --primary-foreground: #ffffff;
   --secondary: #f0f4f9;
-  --secondary-foreground: #131314;
+  --secondary-foreground: #0C0A09;
   --muted: #f0f4f9;
   --muted-foreground: #5f6368;
   --accent: #f0f4f9;
-  --accent-foreground: #131314;
+  --accent-foreground: #0C0A09;
   --destructive: #d93025;
   --destructive-foreground: #ffffff;
   --border: #dadce0;
@@ -34,25 +34,25 @@
 }
 
 .dark {
-  --background: #131314;
-  --foreground: #e3e3e3;
-  --card: #1e1f20;
-  --card-foreground: #e3e3e3;
-  --popover: #1e1f20;
-  --popover-foreground: #e3e3e3;
-  --primary: #e3e3e3;
-  --primary-foreground: #131314;
-  --secondary: #1e1f20;
-  --secondary-foreground: #e3e3e3;
-  --muted: #1e1f20;
-  --muted-foreground: #b4b4b4;
-  --accent: #282a2c;
-  --accent-foreground: #e3e3e3;
-  --destructive: #f28b82;
-  --destructive-foreground: #131314;
-  --border: #3c4043;
-  --input: #3c4043;
-  --ring: #8ab4f8;
+  --background: #0C0A09;
+  --foreground: stone-50;
+  --card: #1C1917;
+  --card-foreground: stone-50;
+  --popover: #1C1917;
+  --popover-foreground: stone-50;
+  --primary: stone-50;
+  --primary-foreground: #0C0A09;
+  --secondary: #1C1917;
+  --secondary-foreground: stone-50;
+  --muted: #1C1917;
+  --muted-foreground: stone-400;
+  --accent: stone-800;
+  --accent-foreground: stone-50;
+  --destructive: rose-500;
+  --destructive-foreground: #0C0A09;
+  --border: stone-800;
+  --input: stone-800;
+  --ring: amber-500;
 }
 
 @theme inline {
@@ -112,7 +112,7 @@
 }
 
 .gemini-gradient {
-  background: linear-gradient(74deg, #4285f4 0, #9b72cb 9%, #d96570 20%, #d96570 24%, #9b72cb 35%, #4285f4 44%, #9b72cb 50%, #d96570 56%, #131314 75%, #131314 100%);
+  background: linear-gradient(74deg, amber-500 0, rose-500 9%, #d96570 20%, #d96570 24%, rose-500 35%, amber-500 44%, rose-500 50%, #d96570 56%, #0C0A09 75%, #0C0A09 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -126,6 +126,10 @@
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
+  }
+  .dot-pattern {
+    background-image: radial-gradient(circle, #27272A 1px, transparent 1px);
+    background-size: 24px 24px;
   }
 }
 

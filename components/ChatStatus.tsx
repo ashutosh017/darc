@@ -27,7 +27,7 @@ export function ChatHero() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -top-[20%] -left-[30%] w-[35vw] h-[35vw] max-w-[400px] max-h-[400px] rounded-full bg-gradient-to-br from-[#d96570]/30 to-[#9b72cb]/20 opacity-40 blur-[80px]"
+          className="absolute -top-[20%] -left-[30%] w-[35vw] h-[35vw] max-w-[400px] max-h-[400px] rounded-full bg-gradient-to-br from-rose-500/30 to-violet-500/20 opacity-40 blur-[80px]"
         />
 
         {/* Sunset peach blob */}
@@ -42,7 +42,7 @@ export function ChatHero() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute top-[20%] -right-[30%] w-[30vw] h-[30vw] max-w-[350px] max-h-[350px] rounded-full bg-gradient-to-br from-[#f0a551]/20 to-[#d96570]/25 opacity-30 blur-[80px]"
+          className="absolute top-[20%] -right-[30%] w-[30vw] h-[30vw] max-w-[350px] max-h-[350px] rounded-full bg-gradient-to-br from-amber-500/20 to-rose-500/25 opacity-30 blur-[80px]"
         />
 
         {/* Soft lavender blob */}
@@ -57,7 +57,7 @@ export function ChatHero() {
             repeat: Infinity,
             ease: "easeInOut",
           }}
-          className="absolute -bottom-[20%] -left-[10%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-br from-[#9b72cb]/30 to-[#4285f4]/20 opacity-35 blur-[90px]"
+          className="absolute -bottom-[20%] -left-[10%] w-[40vw] h-[40vw] max-w-[450px] max-h-[450px] rounded-full bg-gradient-to-br from-violet-500/30 to-amber-500/20 opacity-35 blur-[90px]"
         />
       </div>
 
@@ -67,11 +67,11 @@ export function ChatHero() {
         transition={{ duration: 0.8 }}
         className="flex flex-col items-center relative z-10"
       >
-        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-4 text-white">
+        <h1 className="text-5xl md:text-6xl font-semibold tracking-tight mb-4 text-stone-50">
           Hello, {firstName}
         </h1>
         
-        <p className="text-[#b4b4b4] text-xl md:text-2xl max-w-2xl font-medium leading-tight">
+        <p className="text-stone-400 text-xl md:text-2xl max-w-2xl font-medium leading-tight">
           How can I help you navigate your relationships today?
         </p>
       </motion.div>
@@ -104,12 +104,12 @@ export function TypingIndicator() {
       <div className="flex items-center gap-3">
         {/* Glowing Spinner */}
         <div className="relative w-4.5 h-4.5 flex items-center justify-center shrink-0">
-          <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-[#8ab4f8] animate-spin" />
-          <div className="absolute inset-0 rounded-full border-2 border-[#8ab4f8]/15 animate-pulse" />
+          <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-amber-500 animate-spin" />
+          <div className="absolute inset-0 rounded-full border-2 border-amber-500/15 animate-pulse" />
         </div>
 
         {/* Status Text */}
-        <span className="text-sm font-medium text-[#b4b4b4]/90 tracking-wide select-none">
+        <span className="text-sm font-medium text-stone-400/90 tracking-wide select-none">
           {statuses[statusIndex]}
         </span>
       </div>
@@ -126,7 +126,7 @@ export function TypingIndicator() {
               delay: i * 0.2,
               ease: "easeInOut"
             }}
-            className="w-1.5 h-1.5 rounded-full bg-[#8ab4f8]/80"
+            className="w-1.5 h-1.5 rounded-full bg-amber-500/80"
           />
         ))}
       </div>

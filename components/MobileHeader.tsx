@@ -10,16 +10,16 @@ export function MobileHeader() {
 
   return (
     <>
-      <header className="md:hidden flex items-center justify-between px-4 h-16 bg-[#131314] border-b border-[#3c4043]/30 sticky top-0 z-40">
+      <header className="md:hidden flex items-center justify-between px-4 h-16 bg-[#0C0A09] border-b border-stone-800/30 sticky top-0 z-40">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3] transition-colors"
+          className="p-2 text-stone-400 hover:text-stone-50 transition-colors"
         >
           <Menu size={24} />
         </button>
         
         <div className="flex items-center gap-2">
-          <span className="text-xl font-medium tracking-tight text-[#e3e3e3]">DARC</span>
+          <span className="text-xl font-medium tracking-tight text-stone-50">DARC</span>
         </div>
         
         <div className="w-10" /> {/* Spacer for centering logo */}
@@ -43,7 +43,7 @@ export function MobileHeader() {
               animate={{ x: 0 }}
               exit={{ x: "-100%" }}
               transition={{ type: "tween", duration: 0.3, ease: "easeInOut" }}
-              className="fixed inset-y-0 left-0 w-[280px] bg-[#1e1f20] z-50 md:hidden border-r border-[#3c4043]/30 shadow-2xl"
+              className="fixed inset-y-0 left-0 w-[280px] bg-[#1C1917] z-50 md:hidden border-r border-stone-800/30 shadow-2xl"
             >
               <Sidebar isMobile onClose={() => setIsOpen(false)} />
             </motion.div>

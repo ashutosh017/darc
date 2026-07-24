@@ -92,7 +92,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full text-[#e3e3e3]">
+    <div className="flex flex-col h-full text-stone-50">
       {/* Header & Hamburger/Close */}
       <div className={cn(
         "flex items-center h-16 px-4 shrink-0",
@@ -101,23 +101,23 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
         {isCollapsed ? (
           <button 
             onClick={() => handleToggleCollapse(false)}
-            className="p-2 hover:bg-[#282a2c] rounded-full transition-colors text-[#b4b4b4] hover:text-[#e3e3e3]"
+            className="p-2 hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-stone-50"
           >
             <Menu size={24} />
           </button>
         ) : (
           <>
-            <div className="flex items-center gap-2.5 ml-2 select-none">
+            <div className="flex items-center gap-0 ml-2 select-none">
               <img 
                 src="/darc-ai-logo.png" 
                 alt="DARC Logo" 
-                className="w-6 h-6 object-contain"
+                className="w-10 h-10 object-contain rounded-lg"
               />
-              <span className="text-xl font-medium tracking-tight">DARC</span>
+              <span className="text-xl font-bold tracking-tight">DARC</span>
             </div>
             <button 
               onClick={() => (isMobile ? onClose?.() : handleToggleCollapse(true))}
-              className="p-2 text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#282a2c] rounded-full transition-colors"
+              className="p-2 text-stone-400 hover:text-stone-50 hover:bg-stone-800 rounded-full transition-colors"
             >
               <X size={24} />
             </button>
@@ -142,11 +142,11 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           className={cn(
             "flex items-center gap-3 h-10 transition-all duration-200 shadow-sm",
             isCollapsed 
-              ? "w-10 justify-center rounded-full bg-[#1a1a1c] hover:bg-[#282a2c]" 
-              : "px-4 rounded-full bg-[#1a1a1c] hover:bg-[#282a2c] min-w-[120px]"
+              ? "w-10 justify-center rounded-full bg-stone-900 hover:bg-stone-800" 
+              : "px-4 rounded-full bg-stone-900 hover:bg-stone-800 min-w-[120px]"
           )}
         >
-          <Plus size={20} className="text-[#e3e3e3]" />
+          <Plus size={20} className="text-stone-50" />
           {!isCollapsed && <span className="text-sm font-medium">New Chat</span>}
         </button>
       </div>
@@ -155,7 +155,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       <div className="flex-1 overflow-y-auto scrollbar-hide px-3 space-y-1">
         {!isCollapsed && (
           <div className="px-3 py-2">
-            <span className="text-xs font-medium text-[#b4b4b4]">Recent</span>
+            <span className="text-xs font-medium text-stone-400">Recent</span>
           </div>
         )}
         
@@ -172,8 +172,8 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               className={cn(
                 "flex items-center w-full px-3 py-2.5 rounded-full transition-all duration-200 group relative cursor-pointer",
                 currentChatId === chat.id 
-                  ? "bg-[#000000/20] text-[#e3e3e3]" 
-                  : "text-[#e3e3e3] hover:bg-[#282a2c]"
+                  ? "bg-stone-800 text-stone-50" 
+                  : "text-stone-50 hover:bg-stone-800"
               )}
             >
               <span className="text-sm truncate pr-8">
@@ -185,7 +185,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                   setActiveMenuChatId(activeMenuChatId === chat.id ? null : chat.id);
                 }}
                 className={cn(
-                  "absolute right-3 p-1 rounded-full text-[#b4b4b4] hover:text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-all z-20",
+                  "absolute right-3 p-1 rounded-full text-stone-400 hover:text-stone-50 hover:bg-stone-800/50 transition-all z-20",
                   activeMenuChatId === chat.id
                     ? "opacity-100"
                     : "opacity-100 md:opacity-0 md:group-hover:opacity-100"
@@ -197,7 +197,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               {/* Dropdown Menu */}
               {activeMenuChatId === chat.id && (
                 <div className={cn(
-                  "absolute right-3 z-50 bg-[#282a2c] border border-[#3c4043]/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
+                  "absolute right-3 z-50 bg-stone-800 border border-stone-800/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
                   index < 3 ? "top-full mt-1" : "bottom-full mb-1"
                 )}>
                   <button
@@ -205,9 +205,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                       e.stopPropagation();
                       setActiveMenuChatId(null);
                     }}
-                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
+                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-stone-50 hover:bg-stone-800/50 transition-colors"
                   >
-                    <Share2 size={14} className="text-[#b4b4b4]" />
+                    <Share2 size={14} className="text-stone-400" />
                     <span>Share</span>
                   </button>
                   <button
@@ -215,9 +215,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                       e.stopPropagation();
                       setActiveMenuChatId(null);
                     }}
-                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#e3e3e3] hover:bg-[#3c4043]/50 transition-colors"
+                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-stone-50 hover:bg-stone-800/50 transition-colors"
                   >
-                    <Pencil size={14} className="text-[#b4b4b4]" />
+                    <Pencil size={14} className="text-stone-400" />
                     <span>Rename</span>
                   </button>
                   <button
@@ -226,9 +226,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                       await handleDeleteChat(chat.id);
                       setActiveMenuChatId(null);
                     }}
-                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-[#f28b82] hover:bg-[#f28b82]/10 transition-colors"
+                    className="flex items-center w-full gap-2 px-3 py-2 text-xs text-left text-rose-500 hover:bg-rose-500/10 transition-colors"
                   >
-                    <Trash2 size={14} className="text-[#f28b82]" />
+                    <Trash2 size={14} className="text-rose-500" />
                     <span>Delete</span>
                   </button>
                 </div>
@@ -238,14 +238,14 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
         })}
 
         {isLoadingChats && !isCollapsed && (
-          <div className="px-6 py-2 text-xs text-[#b4b4b4] animate-pulse">
+          <div className="px-6 py-2 text-xs text-stone-400 animate-pulse">
             Loading...
           </div>
         )}
       </div>
 
       {/* Bottom Controls */}
-      <div className="mt-auto p-3 border-t border-[#3c4043]/30 flex flex-col gap-2 shrink-0">
+      <div className="mt-auto p-3 border-t border-stone-800/30 flex flex-col gap-2 shrink-0">
         {/* Daily Limit Stats */}
         {limitStats && (
           isCollapsed ? (
@@ -257,15 +257,15 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                 <svg className="w-10 h-10">
                   <defs>
                     <linearGradient id="limitRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#4285f4" />
-                      <stop offset="100%" stopColor="#9b72cb" />
+                      <stop offset="0%" stopColor="amber-500" />
+                      <stop offset="100%" stopColor="rose-500" />
                     </linearGradient>
                   </defs>
                   <circle
                     cx="20"
                     cy="20"
                     r="16"
-                    className="stroke-[#3c4043]/30"
+                    className="stroke-stone-800/30"
                     strokeWidth="2.5"
                     fill="transparent"
                   />
@@ -283,22 +283,22 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                     style={{ transition: "stroke-dashoffset 0.3s ease" }}
                   />
                 </svg>
-                <span className="absolute text-[10px] font-bold text-[#e3e3e3]">
+                <span className="absolute text-[10px] font-bold text-stone-50">
                   {limitStats.chatsUsed}
                 </span>
               </div>
             </div>
           ) : (
-            <div className="px-4 py-3 bg-[#1a1a1c] border border-[#3c4043]/20 rounded-2xl flex flex-col gap-2 select-none">
+            <div className="px-4 py-3 bg-stone-900 border border-stone-800/20 rounded-2xl flex flex-col gap-2 select-none">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-zinc-400 font-medium">Daily Limit</span>
-                <span className="text-[#8ab4f8] font-bold">
+                <span className="text-stone-400 font-medium">Daily Limit</span>
+                <span className="text-amber-500 font-bold">
                   {limitStats.chatsUsed}/{limitStats.dailyLimit}
                 </span>
               </div>
-              <div className="w-full bg-[#3c4043]/30 h-1.5 rounded-full overflow-hidden">
+              <div className="w-full bg-stone-800/30 h-1.5 rounded-full overflow-hidden">
                 <div 
-                  className="bg-gradient-to-r from-[#4285f4] to-[#9b72cb] h-full rounded-full transition-all duration-300"
+                  className="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-300"
                   style={{ width: `${Math.min(100, (limitStats.chatsUsed / limitStats.dailyLimit) * 100)}%` }}
                 />
               </div>
@@ -314,15 +314,15 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                 if (isMobile) onClose?.();
               }}
               className={cn(
-                "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-[#e3e3e3] hover:bg-[#282a2c] transition-colors",
+                "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-stone-50 hover:bg-stone-800 transition-colors",
                 isCollapsed && "justify-center"
               )}
             >
-              <Settings size={18} className="text-[#b4b4b4]" />
+              <Settings size={18} className="text-stone-400" />
               {!isCollapsed && <span className="text-sm">Settings</span>}
             </button>
             <div className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-[#282a2c] cursor-pointer transition-colors",
+              "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-stone-800 cursor-pointer transition-colors",
               isCollapsed && "justify-center"
             )}>
               {session.user.image ? (
@@ -332,7 +332,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                   className="w-6 h-6 rounded-full"
                 />
               ) : (
-                <User size={18} className="text-[#b4b4b4]" />
+                <User size={18} className="text-stone-400" />
               )}
               {!isCollapsed && (
                 <div className="flex flex-col min-w-0 flex-1">
@@ -341,7 +341,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               )}
               {!isCollapsed && (
                 <button onClick={handleAuth} title="Sign Out">
-                  <LogOut size={16} className="text-[#b4b4b4] hover:text-[#f28b82]" />
+                  <LogOut size={16} className="text-stone-400 hover:text-rose-500" />
                 </button>
               )}
             </div>
@@ -350,11 +350,11 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           <button 
             onClick={handleAuth}
             className={cn(
-              "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-[#e3e3e3] hover:bg-[#282a2c] transition-colors",
+              "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-stone-50 hover:bg-stone-800 transition-colors",
               isCollapsed && "justify-center"
             )}
           >
-            <LogIn size={18} className="text-[#b4b4b4]" />
+            <LogIn size={18} className="text-stone-400" />
             {!isCollapsed && <span className="text-sm font-medium">{isPending ? "Loading..." : "Sign In"}</span>}
           </button>
         )}
@@ -364,7 +364,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-full bg-[#1e1f20]">
+      <div className="flex flex-col h-full bg-[#1C1917]">
         {sidebarContent}
       </div>
     );
@@ -375,7 +375,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       initial={false}
       animate={{ width: isCollapsed ? "68px" : "280px" }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-screen bg-[#1e1f20] hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
+      className="h-screen bg-[#1C1917] hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
     >
       {sidebarContent}
     </motion.aside>

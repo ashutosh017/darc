@@ -6,6 +6,8 @@ import { headers } from "next/headers";
 import { Role } from "@/lib/generated/prisma";
 import { GoogleGenAI } from "@google/genai";
 
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
 export async function getSession() {
   return await auth.api.getSession({
     headers: await headers(),
@@ -46,6 +48,10 @@ export async function saveMessage(chatId: string, text: string, role: Role) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
+  if (!UUID_REGEX.test(chatId)) {
+    throw new Error("Chat not found");
+  }
+
   // Verify chat ownership
   const chat = await db.chat.findUnique({
     where: { id: chatId, user_id: session.user.id },
@@ -65,10 +71,25 @@ export async function getChatMessages(chatId: string) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
+  if (!UUID_REGEX.test(chatId)) {
+    throw new Error("Chat not found or access denied");
+  }
+
+  // Verify chat existence and ownership
+  const chat = await db.chat.findFirst({
+    where: {
+      id: chatId,
+      user_id: session.user.id,
+    },
+  });
+
+  if (!chat) {
+    throw new Error("Chat not found or access denied");
+  }
+
   return await db.message.findMany({
     where: {
       chat_id: chatId,
-      chat: { user_id: session.user.id },
     },
     orderBy: { createdAt: "asc" },
   });

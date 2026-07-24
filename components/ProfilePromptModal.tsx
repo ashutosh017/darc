@@ -236,10 +236,10 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-lg bg-[#1e1f20] border border-[#3c4043]/30 rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-lg bg-[#1C1917] border border-stone-800/30 rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-2xl overflow-hidden"
           >
             {/* Decorative background glows */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#8ab4f8]/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#d96570]/10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Skip / Close Button */}
@@ -255,40 +255,40 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
             {/* Header */}
             <div className="mb-6">
               <div className="flex items-center gap-2 mb-2">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-[#4285f4] to-[#d96570] flex items-center justify-center shadow-md">
+                <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-[#d96570] flex items-center justify-center shadow-md">
                   <Sparkles size={16} className="text-white" />
                 </div>
-                <span className="text-xs font-bold uppercase tracking-widest text-[#8ab4f8]">
+                <span className="text-xs font-bold uppercase tracking-widest text-amber-500">
                   Personalize Coaching
                 </span>
               </div>
-              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-[#e3e3e3]">
+              <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-stone-50">
                 Help us know you better
               </h2>
-              <p className="text-[#b4b4b4] text-xs md:text-sm mt-1 leading-relaxed">
+              <p className="text-stone-400 text-xs md:text-sm mt-1 leading-relaxed">
                 Provide optional details so DARC can deliver tailored guidance. Leave empty if you wish.
               </p>
             </div>
 
             {/* Step Indicators */}
-            <div className="flex items-center justify-between mb-8 bg-[#131314]/50 p-1.5 rounded-full border border-[#3c4043]/20">
+            <div className="flex items-center justify-between mb-8 bg-[#0C0A09]/50 p-1.5 rounded-full border border-stone-800/20">
               <button 
                 onClick={() => setStep(1)} 
-                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${step === 1 ? "bg-[#e3e3e3] text-[#131314] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
+                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${step === 1 ? "bg-stone-50 text-[#0C0A09] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
               >
                 <span className="hidden sm:inline">1. About You</span>
                 <span className="sm:hidden">1. About</span>
               </button>
               <button 
                 onClick={() => setStep(2)} 
-                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${step === 2 ? "bg-[#e3e3e3] text-[#131314] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
+                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${step === 2 ? "bg-stone-50 text-[#0C0A09] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
               >
                 <span className="hidden sm:inline">2. Education & Job</span>
                 <span className="sm:hidden">2. Career</span>
               </button>
               <button 
                 onClick={() => setStep(3)} 
-                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${step === 3 ? "bg-[#e3e3e3] text-[#131314] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
+                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${step === 3 ? "bg-stone-50 text-[#0C0A09] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
               >
                 <span className="hidden sm:inline">3. Goals & Socials</span>
                 <span className="sm:hidden">3. Goals</span>
@@ -321,11 +321,11 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                               <select
                                 value={selectedMonth}
                                 onChange={(e) => setSelectedMonth(e.target.value)}
-                                className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                                className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                               >
-                                <option value="" className="bg-[#1e1f20] text-zinc-500">Month</option>
+                                <option value="" className="bg-[#1C1917] text-zinc-500">Month</option>
                                 {months.map((m) => (
-                                  <option key={m.value} value={m.value} className="bg-[#1e1f20] text-[#e3e3e3]">
+                                  <option key={m.value} value={m.value} className="bg-[#1C1917] text-stone-50">
                                     {m.label}
                                   </option>
                                 ))}
@@ -340,11 +340,11 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                               <select
                                 value={selectedDay}
                                 onChange={(e) => setSelectedDay(e.target.value)}
-                                className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                                className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                               >
-                                <option value="" className="bg-[#1e1f20] text-zinc-500">Day</option>
+                                <option value="" className="bg-[#1C1917] text-zinc-500">Day</option>
                                 {days.map((d) => (
-                                  <option key={d} value={d} className="bg-[#1e1f20] text-[#e3e3e3]">
+                                  <option key={d} value={d} className="bg-[#1C1917] text-stone-50">
                                     {parseInt(d, 10)}
                                   </option>
                                 ))}
@@ -359,11 +359,11 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                               <select
                                 value={selectedYear}
                                 onChange={(e) => setSelectedYear(e.target.value)}
-                                className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                                className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                               >
-                                <option value="" className="bg-[#1e1f20] text-zinc-500">Year</option>
+                                <option value="" className="bg-[#1C1917] text-zinc-500">Year</option>
                                 {years.map((y) => (
-                                  <option key={y} value={y} className="bg-[#1e1f20] text-[#e3e3e3]">
+                                  <option key={y} value={y} className="bg-[#1C1917] text-stone-50">
                                     {y}
                                   </option>
                                 ))}
@@ -393,13 +393,13 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                               }}
                               onFocus={() => setShowSuggestions(true)}
                               placeholder="e.g. San Francisco, CA"
-                              className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                              className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                             />
                             {showSuggestions && (suggestions.length > 0 || isLoadingSuggestions) && (
-                              <div className="absolute left-0 right-0 top-full mt-1 bg-[#1e1f20] border border-[#3c4043]/40 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
+                              <div className="absolute left-0 right-0 top-full mt-1 bg-[#1C1917] border border-stone-800/40 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
                                 {isLoadingSuggestions ? (
                                   <div className="p-3 text-xs text-zinc-500 text-center flex items-center justify-center gap-2">
-                                    <div className="w-3.5 h-3.5 border-2 border-t-transparent border-[#8ab4f8] rounded-full animate-spin" />
+                                    <div className="w-3.5 h-3.5 border-2 border-t-transparent border-amber-500 rounded-full animate-spin" />
                                     Searching locations...
                                   </div>
                                 ) : (
@@ -411,7 +411,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                                         setLocation(suggestion);
                                         setShowSuggestions(false);
                                       }}
-                                      className="w-full text-left px-4 py-2.5 text-xs text-[#e3e3e3] hover:bg-white/5 hover:text-white transition-colors border-b border-[#3c4043]/10 last:border-0"
+                                      className="w-full text-left px-4 py-2.5 text-xs text-stone-50 hover:bg-white/5 hover:text-white transition-colors border-b border-stone-800/10 last:border-0"
                                     >
                                       {suggestion}
                                     </button>
@@ -436,7 +436,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             onChange={(e) => setSeekingReason(e.target.value)}
                             placeholder="e.g. Looking to improve communication with my partner, navigating modern dating..."
                             rows={3}
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] resize-none"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 resize-none"
                           />
                         </div>
                       </div>
@@ -467,7 +467,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                               value={educationSchool}
                               onChange={(e) => setEducationSchool(e.target.value)}
                               placeholder="e.g. Stanford University"
-                              className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                              className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                             />
                           </div>
                         </div>
@@ -481,7 +481,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={educationDegree}
                             onChange={(e) => setEducationDegree(e.target.value)}
                             placeholder="e.g. BS in Computer Science"
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -496,7 +496,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={educationYear}
                             onChange={(e) => setEducationYear(e.target.value)}
                             placeholder="e.g. 2024"
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
 
@@ -513,7 +513,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                               value={employmentDetails}
                               onChange={(e) => setEmploymentDetails(e.target.value)}
                               placeholder="e.g. Product Manager at Google"
-                              className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                              className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                             />
                           </div>
                         </div>
@@ -532,7 +532,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={annualIncome}
                             onChange={(e) => setAnnualIncome(e.target.value)}
                             placeholder="e.g. $120,000"
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -562,7 +562,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={datingGoals}
                             onChange={(e) => setDatingGoals(e.target.value)}
                             placeholder="e.g. Looking for marriage, self-discovery..."
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -581,7 +581,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={instaUrl}
                             onChange={(e) => setInstaUrl(e.target.value)}
                             placeholder="Instagram Profile URL / Username"
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
 
@@ -594,7 +594,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={linkedinUrl}
                             onChange={(e) => setLinkedinUrl(e.target.value)}
                             placeholder="LinkedIn Profile URL"
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
 
@@ -607,7 +607,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                             value={xUrl}
                             onChange={(e) => setXUrl(e.target.value)}
                             placeholder="X (Twitter) Profile URL / Username"
-                            className="w-full bg-zinc-900/40 border border-[#3c4043]/30 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-zinc-900/40 border border-stone-800/30 rounded-xl py-2 pl-9 pr-3 text-xs focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -617,7 +617,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
               </div>
 
               {/* Navigation Action Buttons */}
-              <div className="mt-8 flex items-center justify-between gap-2 sm:gap-4 pt-4 border-t border-[#3c4043]/20">
+              <div className="mt-8 flex items-center justify-between gap-2 sm:gap-4 pt-4 border-t border-stone-800/20">
                 <button
                   onClick={handleSkipAll}
                   disabled={isSubmitting}
@@ -631,7 +631,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                     <button
                       onClick={prevStep}
                       disabled={isSubmitting}
-                      className="flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-2.5 border border-[#3c4043]/30 text-zinc-300 hover:text-white rounded-xl text-xs sm:text-sm font-semibold transition-all hover:bg-white/5 active:scale-[0.98] disabled:opacity-50"
+                      className="flex items-center gap-1 px-3 sm:px-4 py-2 sm:py-2.5 border border-stone-800/30 text-zinc-300 hover:text-white rounded-xl text-xs sm:text-sm font-semibold transition-all hover:bg-white/5 active:scale-[0.98] disabled:opacity-50"
                     >
                       <ChevronLeft size={16} />
                       Back
@@ -642,7 +642,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                     <button
                       onClick={nextStep}
                       disabled={isSubmitting}
-                      className="flex items-center gap-1 px-4 sm:px-5 py-2 sm:py-2.5 bg-zinc-800 text-[#e3e3e3] hover:bg-zinc-700 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50 shadow-inner"
+                      className="flex items-center gap-1 px-4 sm:px-5 py-2 sm:py-2.5 bg-zinc-800 text-stone-50 hover:bg-zinc-700 rounded-xl text-xs sm:text-sm font-semibold transition-all active:scale-[0.98] disabled:opacity-50 shadow-inner"
                     >
                       Next
                       <ChevronRight size={16} />
@@ -651,7 +651,7 @@ export function ProfilePromptModal({ isOpen, onClose }: ProfilePromptModalProps)
                     <button
                       onClick={handleSubmit}
                       disabled={isSubmitting}
-                      className="flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-tr from-[#4285f4] to-[#9b72cb] text-white rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-[0.98] hover:shadow-lg disabled:opacity-50"
+                      className="flex items-center gap-1.5 px-4 sm:px-6 py-2 sm:py-2.5 bg-gradient-to-tr from-amber-500 to-rose-500 text-white rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-[0.98] hover:shadow-lg disabled:opacity-50"
                     >
                       {isSubmitting ? (
                         <div className="w-4 h-4 border-2 border-t-transparent border-white rounded-full animate-spin" />

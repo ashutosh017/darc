@@ -256,10 +256,10 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="relative w-full max-w-lg bg-[#1e1f20] border border-[#3c4043]/30 rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-2xl overflow-hidden"
+            className="relative w-full max-w-lg bg-[#1C1917] border border-stone-800/30 rounded-2xl sm:rounded-[32px] p-4 sm:p-8 md:p-10 shadow-2xl overflow-hidden"
           >
             {/* Decorative background glows */}
-            <div className="absolute -top-24 -right-24 w-48 h-48 bg-[#8ab4f8]/55 opacity-10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -top-24 -right-24 w-48 h-48 bg-amber-500/55 opacity-10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-24 -left-24 w-48 h-48 bg-[#d96570]/55 opacity-10 rounded-full blur-3xl pointer-events-none" />
 
             {/* Close Button */}
@@ -274,35 +274,35 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
             {/* Header */}
             <div className="mb-6 select-none">
               <div className="flex items-center gap-2 mb-2">
-                <Settings size={18} className="text-[#8ab4f8]" />
-                <span className="text-xs font-bold uppercase tracking-widest text-[#8ab4f8]">
+                <Settings size={18} className="text-amber-500" />
+                <span className="text-xs font-bold uppercase tracking-widest text-amber-500">
                   User Settings
                 </span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#e3e3e3]">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-stone-50">
                 Edit Profile details
               </h2>
             </div>
 
             {/* Tabs */}
-            <div className="flex items-center justify-between mb-6 bg-[#131314]/50 p-1 rounded-full border border-[#3c4043]/20 select-none">
+            <div className="flex items-center justify-between mb-6 bg-[#0C0A09]/50 p-1 rounded-full border border-stone-800/20 select-none">
               <button 
                 onClick={() => setActiveTab("personal")} 
-                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${activeTab === "personal" ? "bg-[#e3e3e3] text-[#131314] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
+                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${activeTab === "personal" ? "bg-stone-50 text-[#0C0A09] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
               >
                 <span className="hidden sm:inline">Personal Info</span>
                 <span className="sm:hidden">Personal</span>
               </button>
               <button 
                 onClick={() => setActiveTab("career")} 
-                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${activeTab === "career" ? "bg-[#e3e3e3] text-[#131314] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
+                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${activeTab === "career" ? "bg-stone-50 text-[#0C0A09] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
               >
                 <span className="hidden sm:inline">Education & Career</span>
                 <span className="sm:hidden">Career</span>
               </button>
               <button 
                 onClick={() => setActiveTab("socials")} 
-                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${activeTab === "socials" ? "bg-[#e3e3e3] text-[#131314] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
+                className={`flex-1 text-center py-2 text-xs font-semibold rounded-full transition-all ${activeTab === "socials" ? "bg-stone-50 text-[#0C0A09] shadow" : "text-zinc-400 hover:text-zinc-200"}`}
               >
                 <span className="hidden sm:inline">Social Links</span>
                 <span className="sm:hidden">Socials</span>
@@ -313,7 +313,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
             <div className="min-h-[280px]">
               {isLoading ? (
                 <div className="flex flex-col items-center justify-center py-20 gap-3">
-                  <Loader2 className="w-8 h-8 text-[#8ab4f8] animate-spin" />
+                  <Loader2 className="w-8 h-8 text-amber-500 animate-spin" />
                   <span className="text-xs text-zinc-500 font-medium">Loading profile details...</span>
                 </div>
               ) : (
@@ -332,11 +332,11 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             <select
                               value={selectedMonth}
                               onChange={(e) => setSelectedMonth(e.target.value)}
-                              className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                              className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                             >
-                              <option value="" className="bg-[#1e1f20] text-zinc-500">Month</option>
+                              <option value="" className="bg-[#1C1917] text-zinc-500">Month</option>
                               {months.map((m) => (
-                                <option key={m.value} value={m.value} className="bg-[#1e1f20] text-[#e3e3e3]">
+                                <option key={m.value} value={m.value} className="bg-[#1C1917] text-stone-50">
                                   {m.label}
                                 </option>
                               ))}
@@ -351,11 +351,11 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             <select
                               value={selectedDay}
                               onChange={(e) => setSelectedDay(e.target.value)}
-                              className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                              className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                             >
-                              <option value="" className="bg-[#1e1f20] text-zinc-500">Day</option>
+                              <option value="" className="bg-[#1C1917] text-zinc-500">Day</option>
                               {days.map((d) => (
-                                <option key={d} value={d} className="bg-[#1e1f20] text-[#e3e3e3]">
+                                <option key={d} value={d} className="bg-[#1C1917] text-stone-50">
                                   {parseInt(d, 10)}
                                 </option>
                               ))}
@@ -370,11 +370,11 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             <select
                               value={selectedYear}
                               onChange={(e) => setSelectedYear(e.target.value)}
-                              className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] appearance-none cursor-pointer"
+                              className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 appearance-none cursor-pointer"
                             >
-                              <option value="" className="bg-[#1e1f20] text-zinc-500">Year</option>
+                              <option value="" className="bg-[#1C1917] text-zinc-500">Year</option>
                               {years.map((y) => (
-                                <option key={y} value={y} className="bg-[#1e1f20] text-[#e3e3e3]">
+                                <option key={y} value={y} className="bg-[#1C1917] text-stone-50">
                                   {y}
                                 </option>
                               ))}
@@ -404,13 +404,13 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             }}
                             onFocus={() => setShowSuggestions(true)}
                             placeholder="e.g. San Francisco, CA"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                           {showSuggestions && (suggestions.length > 0 || isLoadingSuggestions) && (
-                            <div className="absolute left-0 right-0 top-full mt-1 bg-[#1e1f20] border border-[#3c4043]/40 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
+                            <div className="absolute left-0 right-0 top-full mt-1 bg-[#1C1917] border border-stone-800/40 rounded-xl shadow-2xl z-50 max-h-48 overflow-y-auto scrollbar-hide">
                               {isLoadingSuggestions ? (
                                 <div className="p-3 text-xs text-zinc-500 text-center flex items-center justify-center gap-2">
-                                  <div className="w-3.5 h-3.5 border-2 border-t-transparent border-[#8ab4f8] rounded-full animate-spin" />
+                                  <div className="w-3.5 h-3.5 border-2 border-t-transparent border-amber-500 rounded-full animate-spin" />
                                   Searching locations...
                                 </div>
                               ) : (
@@ -422,7 +422,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                                       setLocation(suggestion);
                                       setShowSuggestions(false);
                                     }}
-                                    className="w-full text-left px-4 py-2.5 text-xs text-[#e3e3e3] hover:bg-white/5 hover:text-white transition-colors border-b border-[#3c4043]/10 last:border-0"
+                                    className="w-full text-left px-4 py-2.5 text-xs text-stone-50 hover:bg-white/5 hover:text-white transition-colors border-b border-stone-800/10 last:border-0"
                                   >
                                     {suggestion}
                                   </button>
@@ -447,7 +447,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={datingGoals}
                             onChange={(e) => setDatingGoals(e.target.value)}
                             placeholder="e.g. Looking for marriage, self-discovery..."
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -466,7 +466,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             onChange={(e) => setSeekingReason(e.target.value)}
                             placeholder="e.g. Navigating relationship milestones..."
                             rows={2}
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3] resize-none"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50 resize-none"
                           />
                         </div>
                       </div>
@@ -490,7 +490,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                               value={educationSchool}
                               onChange={(e) => setEducationSchool(e.target.value)}
                               placeholder="School / College"
-                              className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                              className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                             />
                           </div>
                         </div>
@@ -504,7 +504,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={educationDegree}
                             onChange={(e) => setEducationDegree(e.target.value)}
                             placeholder="Degree / Field"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -519,7 +519,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={educationYear}
                             onChange={(e) => setEducationYear(e.target.value)}
                             placeholder="e.g. 2024"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 px-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
 
@@ -536,7 +536,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                               value={employmentDetails}
                               onChange={(e) => setEmploymentDetails(e.target.value)}
                               placeholder="e.g. Engineer, Business owner..."
-                              className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                              className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                             />
                           </div>
                         </div>
@@ -555,7 +555,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={annualIncome}
                             onChange={(e) => setAnnualIncome(e.target.value)}
                             placeholder="e.g. $100k - $120k"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -578,7 +578,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={instaUrl}
                             onChange={(e) => setInstaUrl(e.target.value)}
                             placeholder="Instagram Profile URL / Username"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -596,7 +596,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={linkedinUrl}
                             onChange={(e) => setLinkedinUrl(e.target.value)}
                             placeholder="LinkedIn Profile URL"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -614,7 +614,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                             value={xUrl}
                             onChange={(e) => setXUrl(e.target.value)}
                             placeholder="X (Twitter) Profile URL / Username"
-                            className="w-full bg-[#131314]/40 border border-[#3c4043]/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-[#8ab4f8] transition-all text-[#e3e3e3]"
+                            className="w-full bg-[#0C0A09]/40 border border-stone-800/30 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500 transition-all text-stone-50"
                           />
                         </div>
                       </div>
@@ -626,7 +626,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
 
             {/* Footer Actions */}
             {!isLoading && (
-              <div className="mt-8 flex items-center justify-end gap-3 pt-4 border-t border-[#3c4043]/20">
+              <div className="mt-8 flex items-center justify-end gap-3 pt-4 border-t border-stone-800/20">
                 <button
                   onClick={onClose}
                   disabled={isSaving}
@@ -638,7 +638,7 @@ export function SettingsModal({ isOpen, onClose, onSaved }: SettingsModalProps) 
                 <button
                   onClick={handleSave}
                   disabled={isSaving || saveSuccess}
-                  className={`flex items-center gap-1.5 px-6 py-2.5 text-white rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-[0.98] ${saveSuccess ? "bg-emerald-600 hover:bg-emerald-600" : "bg-gradient-to-tr from-[#4285f4] to-[#9b72cb] hover:shadow-lg"} disabled:opacity-50`}
+                  className={`flex items-center gap-1.5 px-6 py-2.5 text-white rounded-xl text-xs sm:text-sm font-bold transition-all active:scale-[0.98] ${saveSuccess ? "bg-emerald-600 hover:bg-emerald-600" : "bg-gradient-to-tr from-amber-500 to-rose-500 hover:shadow-lg"} disabled:opacity-50`}
                 >
                   {isSaving ? (
                     <Loader2 className="w-4 h-4 animate-spin" />
