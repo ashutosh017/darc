@@ -4,7 +4,6 @@ import React, { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { 
   Plus, 
-  Menu,
   User,
   X,
   LogOut,
@@ -101,9 +100,12 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
         {isCollapsed ? (
           <button 
             onClick={() => handleToggleCollapse(false)}
-            className="p-2 hover:bg-stone-800 rounded-full transition-colors text-stone-400 hover:text-stone-50"
+            className="p-2 text-stone-400 hover:text-stone-50 transition-all duration-200 group rounded-full hover:bg-stone-800/40 flex items-center justify-center"
           >
-            <Menu size={24} />
+            <div className="flex flex-col gap-1.5 justify-center items-start w-5 h-4">
+              <span className="block h-[2px] w-5 rounded-full bg-current transition-all duration-300 group-hover:translate-x-0.5" />
+              <span className="block h-[2px] w-3 rounded-full bg-current transition-all duration-300 group-hover:w-5" />
+            </div>
           </button>
         ) : (
           <>
@@ -375,7 +377,12 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       initial={false}
       animate={{ width: isCollapsed ? "68px" : "280px" }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-[100dvh] bg-[#1C1917]/30 backdrop-blur-xl hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
+      className={cn(
+        "h-[100dvh] hidden md:flex flex-col transition-all z-30 overflow-hidden",
+        isCollapsed 
+          ? "absolute left-0 top-0 bottom-0 bg-transparent backdrop-blur-none" 
+          : "relative bg-[#1C1917]/30 backdrop-blur-xl"
+      )}
     >
       {sidebarContent}
     </motion.aside>

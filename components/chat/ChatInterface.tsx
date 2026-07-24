@@ -342,23 +342,25 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   return (
     <div className="flex flex-col h-full bg-[#0C0A09] text-stone-50 relative overflow-hidden">
       {/* Mobile background gradients */}
-      <div className="absolute inset-0 pointer-events-none z-0">
-        <motion.div
-          animate={{ x: [0, 30, -20, 0], y: [0, -40, 30, 0], scale: [1, 1.1, 0.95, 1] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-[10%] -left-[20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-rose-500/40 to-violet-500/30 opacity-50 blur-[60px]"
-        />
-        <motion.div
-          animate={{ x: [0, -40, 20, 0], y: [0, 30, -30, 0], scale: [1, 0.95, 1.05, 1] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[25%] -right-[15%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-amber-500/30 to-rose-500/35 opacity-40 blur-[50px]"
-        />
-        <motion.div
-          animate={{ x: [0, 20, -30, 0], y: [0, 30, 40, 0], scale: [1, 1.05, 0.95, 1] }}
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-[10%] -left-[5%] w-[65vw] h-[65vw] rounded-full bg-gradient-to-br from-violet-500/40 to-amber-500/30 opacity-45 blur-[50px]"
-        />
-      </div>
+      {messages.length === 0 && (
+        <div className="absolute inset-0 pointer-events-none z-0">
+          <motion.div
+            animate={{ x: [0, 30, -20, 0], y: [0, -40, 30, 0], scale: [1, 1.1, 0.95, 1] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -top-[10%] -left-[20%] w-[100vw] h-[100vw] md:w-[60vw] md:h-[60vw] rounded-full bg-gradient-to-br from-rose-500/40 to-violet-500/30 opacity-50 blur-[40px] md:blur-[60px]"
+          />
+          <motion.div
+            animate={{ x: [0, -40, 20, 0], y: [0, 30, -30, 0], scale: [1, 0.95, 1.05, 1] }}
+            transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute top-[25%] -right-[15%] w-[90vw] h-[90vw] md:w-[55vw] md:h-[55vw] rounded-full bg-gradient-to-br from-amber-500/30 to-rose-500/35 opacity-40 blur-[35px] md:blur-[50px]"
+          />
+          <motion.div
+            animate={{ x: [0, 20, -30, 0], y: [0, 30, 40, 0], scale: [1, 1.05, 0.95, 1] }}
+            transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+            className="absolute -bottom-[10%] -left-[5%] w-[110vw] h-[110vw] md:w-[65vw] md:h-[65vw] rounded-full bg-gradient-to-br from-violet-500/40 to-amber-500/30 opacity-45 blur-[35px] md:blur-[50px]"
+          />
+        </div>
+      )}
 
       <MobileHeader />
 
@@ -379,7 +381,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
               : "overflow-y-auto scrollbar-hide"
           }`}
         >
-          <div className={`max-w-3xl mx-auto w-full ${messages.length === 0 ? "" : "pt-8 pb-8 md:pt-12"}`}>
+          <div className={`max-w-3xl mx-auto w-full ${messages.length === 0 ? "" : "pt-20 pb-8 md:pt-12"}`}>
             <AnimatePresence mode="popLayout">
               {isLoadingMessages ? (
                 <div
@@ -443,7 +445,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       </div>
 
       {session && (
-        <div className={`relative z-20 py-2 ${messages.length > 0 ? "bg-gradient-to-t from-[#0C0A09] via-[#0C0A09]/75 to-transparent" : ""}`}>
+        <div className={`relative z-20 py-2 ${messages.length > 0 ? "bg-[#0C0A09]" : ""}`}>
           {limitStats && limitStats.chatsUsed >= limitStats.dailyLimit && (
             <div className="max-w-3xl mx-auto px-4 mb-3">
               <div className="py-2.5 px-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs text-zinc-400 text-center flex items-center justify-center gap-2">

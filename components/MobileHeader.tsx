@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Sidebar } from "./Sidebar";
-import { Menu, X } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
 export function MobileHeader() {
@@ -10,12 +9,15 @@ export function MobileHeader() {
 
   return (
     <>
-      <header className="md:hidden flex items-center justify-between px-4 h-16 bg-[#0C0A09] border-b border-stone-800/30 sticky top-0 z-40">
+      <header className="md:hidden flex items-center justify-between px-4 h-12 bg-stone-900/30 backdrop-blur-xl border border-white/10 rounded-full fixed top-3 left-4 right-4 z-40 shadow-[0_8px_32px_0_rgba(0,0,0,0.37)]">
         <button
           onClick={() => setIsOpen(true)}
-          className="p-2 text-stone-400 hover:text-stone-50 transition-colors"
+          className="p-2 text-stone-400 hover:text-stone-50 transition-all duration-200 group rounded-full hover:bg-stone-800/40 flex items-center justify-center"
         >
-          <Menu size={24} />
+          <div className="flex flex-col gap-1.5 justify-center items-start w-5 h-4">
+            <span className="block h-[2px] w-5 rounded-full bg-current transition-all duration-300 group-hover:translate-x-0.5" />
+            <span className="block h-[2px] w-3 rounded-full bg-current transition-all duration-300 group-hover:w-5" />
+          </div>
         </button>
         
         <div className="flex items-center gap-2">
