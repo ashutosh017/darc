@@ -134,7 +134,7 @@ export default function LandingPageClient() {
   );
 
   return (
-    <div ref={containerRef} className="min-h-[100dvh] bg-[#0C0A09] text-stone-50 overflow-x-hidden font-sans">
+    <div ref={containerRef} className="min-h-screen bg-[#0C0A09] text-stone-50 overflow-x-hidden font-sans">
       {/* HEADER */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -157,7 +157,7 @@ export default function LandingPageClient() {
 
       <main>
         {/* HERO SECTION */}
-        <section className="relative pt-40 pb-20 md:pt-52 md:pb-32 px-6 flex flex-col items-center text-center min-h-[90vh] justify-center">
+        <section className="relative pt-40 pb-20 md:pt-52 md:pb-32 px-6 flex flex-col items-center text-center min-h-[90dvh] justify-center overflow-hidden">
           <div className="max-w-4xl z-10 relative">
             <h1 className="hero-headline invisible text-5xl sm:text-6xl lg:text-7xl font-medium tracking-tight mb-8">
               Your{" "}

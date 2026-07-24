@@ -355,9 +355,13 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       <div className="flex-1 relative overflow-hidden">
         <div
           ref={scrollRef}
-          className="h-full overflow-y-auto scrollbar-hide px-4 md:px-0"
+          className={`h-full px-4 md:px-0 ${
+            messages.length === 0
+              ? "overflow-hidden flex flex-col justify-center"
+              : "overflow-y-auto scrollbar-hide"
+          }`}
         >
-          <div className="max-w-3xl mx-auto pt-8 pb-8 md:pt-12">
+          <div className={`max-w-3xl mx-auto w-full ${messages.length === 0 ? "" : "pt-8 pb-8 md:pt-12"}`}>
             <AnimatePresence mode="popLayout">
               {isLoadingMessages ? (
                 <div

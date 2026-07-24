@@ -14,7 +14,7 @@ export function ChatHero() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] max-w-3xl mx-auto text-center px-4 relative">
       {/* Soft romantic background blobs */}
-      <div className="absolute inset-0 overflow-visible pointer-events-none z-0">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         {/* Rose pink blob */}
         <motion.div
           animate={{
