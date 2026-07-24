@@ -405,7 +405,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       </div>
 
       {session && (
-        <div className="relative z-20 pb-2 md:pb-6 bg-gradient-to-t from-[#0C0A09] via-[#0C0A09] to-transparent pt-8">
+        <div className="relative z-20 pb-2 md:pb-6 bg-gradient-to-t from-[#0C0A09] via-[#0C0A09]/75 to-transparent pt-2">
           {limitStats && limitStats.chatsUsed >= limitStats.dailyLimit && (
             <div className="max-w-3xl mx-auto px-4 mb-3">
               <div className="py-2.5 px-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs text-zinc-400 text-center flex items-center justify-center gap-2">

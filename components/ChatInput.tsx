@@ -37,7 +37,7 @@ export function ChatInput({ onSendMessage, disabled, placeholder }: ChatInputPro
 
   return (
     <div className="w-full max-w-3xl mx-auto px-4 pb-4">
-      <div className="relative flex flex-col bg-stone-900 rounded-[32px] p-2 transition-all duration-300 shadow-lg border border-transparent focus-within:border-amber-500/50 focus-within:ring-1 focus-within:ring-amber-500/20">
+      <div className="relative flex flex-col bg-stone-900 rounded-[32px] p-2 transition-[border-color,box-shadow] duration-200 shadow-lg border border-transparent focus-within:border-amber-500/50 focus-within:ring-1 focus-within:ring-amber-500/20">
         <div className="flex items-end gap-2 px-2">
           {/* Optional: Add a plus or upload button like Gemini */}
           {/* <button className="p-3 text-stone-400 hover:text-stone-50 hover:bg-stone-800 rounded-full transition-colors mb-1">
