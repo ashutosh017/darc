@@ -364,7 +364,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
 
   if (isMobile) {
     return (
-      <div className="flex flex-col h-full bg-[#1C1917]">
+      <div className="flex flex-col h-full bg-[#1C1917]/30 backdrop-blur-xl">
         {sidebarContent}
       </div>
     );
@@ -375,7 +375,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       initial={false}
       animate={{ width: isCollapsed ? "68px" : "280px" }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-[100dvh] bg-[#1C1917] hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
+      className="h-[100dvh] bg-[#1C1917]/30 backdrop-blur-xl hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
     >
       {sidebarContent}
     </motion.aside>

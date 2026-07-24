@@ -63,7 +63,6 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const skipNextFetchRef = useRef(false);
   const searchParams = useSearchParams();
-
   // Sync localChatId when the chatId prop changes
   useEffect(() => {
     const cleanId = chatId === "undefined" || chatId === "null" ? null : chatId;
@@ -341,7 +340,26 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   if (isSessionPending) return null;
 
   return (
-    <div className="flex flex-col h-full bg-[#0C0A09] text-stone-50">
+    <div className="flex flex-col h-full bg-[#0C0A09] text-stone-50 relative overflow-hidden">
+      {/* Mobile background gradients */}
+      <div className="absolute inset-0 pointer-events-none z-0">
+        <motion.div
+          animate={{ x: [0, 30, -20, 0], y: [0, -40, 30, 0], scale: [1, 1.1, 0.95, 1] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -top-[10%] -left-[20%] w-[60vw] h-[60vw] rounded-full bg-gradient-to-br from-rose-500/40 to-violet-500/30 opacity-50 blur-[60px]"
+        />
+        <motion.div
+          animate={{ x: [0, -40, 20, 0], y: [0, 30, -30, 0], scale: [1, 0.95, 1.05, 1] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[25%] -right-[15%] w-[55vw] h-[55vw] rounded-full bg-gradient-to-br from-amber-500/30 to-rose-500/35 opacity-40 blur-[50px]"
+        />
+        <motion.div
+          animate={{ x: [0, 20, -30, 0], y: [0, 30, 40, 0], scale: [1, 1.05, 0.95, 1] }}
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute -bottom-[10%] -left-[5%] w-[65vw] h-[65vw] rounded-full bg-gradient-to-br from-violet-500/40 to-amber-500/30 opacity-45 blur-[50px]"
+        />
+      </div>
+
       <MobileHeader />
 
       {!session && <SignInModal />}
@@ -374,15 +392,31 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
                 <ChatHero key="hero" />
               ) : (
                 <div key="messages" className="flex flex-col">
-                  {messages.map((message) => (
-                    <ChatMessage
-                      key={message.id}
-                      role={message.role === "USER" ? "user" : "coach"}
-                      content={message.text}
-                      isComplete={message.isComplete}
-                    />
-                  ))}
-                  {isTyping && <TypingIndicator key="typing" />}
+                  {messages.map((message, index) => {
+                    const isLast = index === messages.length - 1;
+                    return (
+                      <div key={message.id}>
+                        <ChatMessage
+                          role={message.role === "USER" ? "user" : "coach"}
+                          content={message.text}
+                          isComplete={message.isComplete}
+                        />
+                        {isLast && !isTyping && (
+                          <p className="md:hidden text-left text-[11px] text-stone-500 -mt-6 mb-8 px-0 select-none leading-relaxed">
+                            DARC may display inaccurate info, so double-check its coaching insights.
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                  {isTyping && (
+                    <div className="flex flex-col">
+                      <TypingIndicator key="typing" />
+                      <p className="md:hidden text-left text-[11px] text-stone-500 -mt-4 mb-8 px-0 select-none leading-relaxed">
+                        DARC may display inaccurate info, so double-check its coaching insights.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
             </AnimatePresence>
@@ -402,10 +436,14 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
             </AnimatePresence>
           </div>
         </div>
+
+        {messages.length > 0 && (
+          <div className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 z-10 bg-gradient-to-t from-[#0C0A09]/50 to-transparent" />
+        )}
       </div>
 
       {session && (
-        <div className="relative z-20 pb-2 md:pb-6 bg-gradient-to-t from-[#0C0A09] via-[#0C0A09]/75 to-transparent pt-2">
+        <div className={`relative z-20 py-2 ${messages.length > 0 ? "bg-gradient-to-t from-[#0C0A09] via-[#0C0A09]/75 to-transparent" : ""}`}>
           {limitStats && limitStats.chatsUsed >= limitStats.dailyLimit && (
             <div className="max-w-3xl mx-auto px-4 mb-3">
               <div className="py-2.5 px-4 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-xs text-zinc-400 text-center flex items-center justify-center gap-2">
