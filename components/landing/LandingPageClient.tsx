@@ -134,7 +134,7 @@ export default function LandingPageClient() {
   );
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#0C0A09] text-stone-50 overflow-x-hidden font-sans">
+    <div ref={containerRef} className="min-h-[100dvh] bg-[#0C0A09] text-stone-50 overflow-x-hidden font-sans">
       {/* HEADER */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

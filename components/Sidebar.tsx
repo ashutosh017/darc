@@ -375,7 +375,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       initial={false}
       animate={{ width: isCollapsed ? "68px" : "280px" }}
       transition={{ duration: 0.2, ease: "easeInOut" }}
-      className="h-screen bg-[#1C1917] hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
+      className="h-[100dvh] bg-[#1C1917] hidden md:flex flex-col transition-all relative z-30 overflow-hidden"
     >
       {sidebarContent}
     </motion.aside>
