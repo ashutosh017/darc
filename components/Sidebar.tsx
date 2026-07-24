@@ -115,11 +115,11 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           </button>
         ) : (
           <>
-            <div className="flex items-center gap-0 ml-2 select-none">
+            <div className="flex items-center gap-2 ml-2 select-none">
               <img
                 src="/darc_logo.png"
                 alt="DARC Logo"
-                className="w-10 h-10 object-contain rounded-lg"
+                className="w-6 h-6 object-contain rounded-lg"
               />
               <span className="text-xl font-bold tracking-tight">DARC</span>
             </div>

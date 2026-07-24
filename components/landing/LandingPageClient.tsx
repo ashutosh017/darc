@@ -151,12 +151,12 @@ export default function LandingPageClient() {
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-0">
+          <Link href="/" className="flex items-center gap-2">
             <Image
               src="/darc_logo.png"
               alt="DaRC Logo"
-              width={48}
-              height={48}
+              width={24}
+              height={24}
               className="rounded-lg"
             />
             <span className="font-bold tracking-tight text-xl">DARC</span>
