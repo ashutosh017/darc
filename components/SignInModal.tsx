@@ -10,7 +10,7 @@ export function SignInModal() {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       {/* Backdrop */}
       <div className="absolute inset-0 bg-[#0C0A09]/80 backdrop-blur-sm" />
-      
+
       {/* Modal */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -23,29 +23,34 @@ export function SignInModal() {
 
         <div className="relative flex flex-col items-center text-center">
           <div className="w-16 h-16 rounded-2xl bg-[#0C0A09] flex items-center justify-center mb-8 border border-stone-800/30 shadow-inner">
-            <img 
-              src="/darc-ai-logo.png" 
-              alt="DARC Logo" 
+            <img
+              src="/darc_logo.png"
+              alt="DARC Logo"
               className="w-10 h-10 object-contain"
             />
           </div>
-          
+
           <h2 className="text-3xl font-semibold text-stone-50 mb-4 tracking-tight">
             Unlock DARC
           </h2>
-          
+
           <p className="text-stone-400 text-lg mb-10 leading-relaxed">
             Sign in to start your personalized relationship coaching journey.
           </p>
-          
+
           <button
-            onClick={() => signIn.social({ provider: "google", callbackURL: "/chat" })}
+            onClick={() =>
+              signIn.social({ provider: "google", callbackURL: "/chat" })
+            }
             className="flex items-center justify-center gap-3 w-full py-4 bg-stone-50 text-[#0C0A09] rounded-full font-semibold hover:bg-white transition-all active:scale-[0.98] shadow-lg group"
           >
-            <LogIn size={20} className="transition-transform group-hover:translate-x-1" />
+            <LogIn
+              size={20}
+              className="transition-transform group-hover:translate-x-1"
+            />
             Continue with Google
           </button>
-          
+
           <div className="mt-8 flex items-center gap-2 text-stone-400 text-sm">
             <Sparkles size={14} className="text-amber-500" />
             <span>AI-powered coaching for modern intimacy</span>

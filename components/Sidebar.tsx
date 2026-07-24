@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useCallback } from "react";
 import { cn } from "@/lib/utils";
-import { 
-  Plus, 
+import {
+  Plus,
   User,
   X,
   LogOut,
@@ -29,7 +29,8 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [activeMenuChatId, setActiveMenuChatId] = useState<string | null>(null);
   const { data: session, isPending } = useSession();
-  const { chats, currentChatId, refreshChats, isLoadingChats, limitStats } = useChat();
+  const { chats, currentChatId, refreshChats, isLoadingChats, limitStats } =
+    useChat();
   const router = useRouter();
 
   // Load state on mount
@@ -68,7 +69,10 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       await deleteChat(chatId);
       await refreshChats();
       if (currentChatId === chatId) {
-        if (typeof window !== "undefined" && window.location.pathname !== "/chat") {
+        if (
+          typeof window !== "undefined" &&
+          window.location.pathname !== "/chat"
+        ) {
           window.location.href = "/chat";
         } else {
           router.push("/chat");
@@ -93,12 +97,14 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
   const sidebarContent = (
     <div className="flex flex-col h-full text-stone-50">
       {/* Header & Hamburger/Close */}
-      <div className={cn(
-        "flex items-center h-16 px-4 shrink-0",
-        isCollapsed ? "justify-center" : "justify-between"
-      )}>
+      <div
+        className={cn(
+          "flex items-center h-16 px-4 shrink-0",
+          isCollapsed ? "justify-center" : "justify-between",
+        )}
+      >
         {isCollapsed ? (
-          <button 
+          <button
             onClick={() => handleToggleCollapse(false)}
             className="p-2 text-stone-400 hover:text-stone-50 transition-all duration-200 group rounded-full hover:bg-stone-800/40 flex items-center justify-center"
           >
@@ -110,15 +116,17 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
         ) : (
           <>
             <div className="flex items-center gap-0 ml-2 select-none">
-              <img 
-                src="/darc-ai-logo.png" 
-                alt="DARC Logo" 
+              <img
+                src="/darc_logo.png"
+                alt="DARC Logo"
                 className="w-10 h-10 object-contain rounded-lg"
               />
               <span className="text-xl font-bold tracking-tight">DARC</span>
             </div>
-            <button 
-              onClick={() => (isMobile ? onClose?.() : handleToggleCollapse(true))}
+            <button
+              onClick={() =>
+                isMobile ? onClose?.() : handleToggleCollapse(true)
+              }
               className="p-2 text-stone-400 hover:text-stone-50 hover:bg-stone-800 rounded-full transition-colors"
             >
               <X size={24} />
@@ -128,13 +136,18 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       </div>
 
       {/* New Chat Button */}
-      <div className={cn(
-        "px-4 py-2 mb-4",
-        isCollapsed ? "flex justify-center" : ""
-      )}>
+      <div
+        className={cn(
+          "px-4 py-2 mb-4",
+          isCollapsed ? "flex justify-center" : "",
+        )}
+      >
         <button
           onClick={() => {
-            if (typeof window !== "undefined" && window.location.pathname !== "/chat") {
+            if (
+              typeof window !== "undefined" &&
+              window.location.pathname !== "/chat"
+            ) {
               window.location.href = "/chat";
             } else {
               router.push("/chat");
@@ -143,13 +156,15 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
           }}
           className={cn(
             "flex items-center gap-3 h-10 transition-all duration-200 shadow-sm",
-            isCollapsed 
-              ? "w-10 justify-center rounded-full bg-stone-900 hover:bg-stone-800" 
-              : "px-4 rounded-full bg-stone-900 hover:bg-stone-800 min-w-[120px]"
+            isCollapsed
+              ? "w-10 justify-center rounded-full bg-stone-900 hover:bg-stone-800"
+              : "px-4 rounded-full bg-stone-900 hover:bg-stone-800 min-w-[120px]",
           )}
         >
           <Plus size={20} className="text-stone-50" />
-          {!isCollapsed && <span className="text-sm font-medium">New Chat</span>}
+          {!isCollapsed && (
+            <span className="text-sm font-medium">New Chat</span>
+          )}
         </button>
       </div>
 
@@ -160,7 +175,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
             <span className="text-xs font-medium text-stone-400">Recent</span>
           </div>
         )}
-        
+
         {chats.map((chat, index) => {
           if (isCollapsed) return null;
           return (
@@ -173,9 +188,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               title={chat.title || "Untitled Chat"}
               className={cn(
                 "flex items-center w-full px-3 py-2.5 rounded-full transition-all duration-200 group relative cursor-pointer",
-                currentChatId === chat.id 
-                  ? "bg-stone-800 text-stone-50" 
-                  : "text-stone-50 hover:bg-stone-800"
+                currentChatId === chat.id
+                  ? "bg-stone-800 text-stone-50"
+                  : "text-stone-50 hover:bg-stone-800",
               )}
             >
               <span className="text-sm truncate pr-8">
@@ -184,13 +199,15 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  setActiveMenuChatId(activeMenuChatId === chat.id ? null : chat.id);
+                  setActiveMenuChatId(
+                    activeMenuChatId === chat.id ? null : chat.id,
+                  );
                 }}
                 className={cn(
                   "absolute right-3 p-1 rounded-full text-stone-400 hover:text-stone-50 hover:bg-stone-800/50 transition-all z-20",
                   activeMenuChatId === chat.id
                     ? "opacity-100"
-                    : "opacity-100 md:opacity-0 md:group-hover:opacity-100"
+                    : "opacity-100 md:opacity-0 md:group-hover:opacity-100",
                 )}
               >
                 <MoreVertical size={14} />
@@ -198,10 +215,12 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
 
               {/* Dropdown Menu */}
               {activeMenuChatId === chat.id && (
-                <div className={cn(
-                  "absolute right-3 z-50 bg-stone-800 border border-stone-800/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
-                  index < 3 ? "top-full mt-1" : "bottom-full mb-1"
-                )}>
+                <div
+                  className={cn(
+                    "absolute right-3 z-50 bg-stone-800 border border-stone-800/30 rounded-xl shadow-lg py-1.5 min-w-[120px]",
+                    index < 3 ? "top-full mt-1" : "bottom-full mb-1",
+                  )}
+                >
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
@@ -249,16 +268,22 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       {/* Bottom Controls */}
       <div className="mt-auto p-3 border-t border-stone-800/30 flex flex-col gap-2 shrink-0">
         {/* Daily Limit Stats */}
-        {limitStats && (
-          isCollapsed ? (
-            <div 
-              className="flex justify-center py-2 cursor-default select-none shrink-0" 
+        {limitStats &&
+          (isCollapsed ? (
+            <div
+              className="flex justify-center py-2 cursor-default select-none shrink-0"
               title={`Daily Limit: ${limitStats.chatsUsed}/${limitStats.dailyLimit} chats used`}
             >
               <div className="relative w-10 h-10 flex items-center justify-center">
                 <svg className="w-10 h-10">
                   <defs>
-                    <linearGradient id="limitRingGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <linearGradient
+                      id="limitRingGradient"
+                      x1="0%"
+                      y1="0%"
+                      x2="100%"
+                      y2="100%"
+                    >
                       <stop offset="0%" stopColor="amber-500" />
                       <stop offset="100%" stopColor="rose-500" />
                     </linearGradient>
@@ -279,7 +304,12 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                     strokeWidth="2.5"
                     fill="transparent"
                     strokeDasharray={100.5}
-                    strokeDashoffset={100.5 - (100.5 * Math.min(limitStats.chatsUsed, limitStats.dailyLimit)) / limitStats.dailyLimit}
+                    strokeDashoffset={
+                      100.5 -
+                      (100.5 *
+                        Math.min(limitStats.chatsUsed, limitStats.dailyLimit)) /
+                        limitStats.dailyLimit
+                    }
                     strokeLinecap="round"
                     className="transform -rotate-90 origin-center"
                     style={{ transition: "stroke-dashoffset 0.3s ease" }}
@@ -299,14 +329,15 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                 </span>
               </div>
               <div className="w-full bg-stone-800/30 h-1.5 rounded-full overflow-hidden">
-                <div 
+                <div
                   className="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-300"
-                  style={{ width: `${Math.min(100, (limitStats.chatsUsed / limitStats.dailyLimit) * 100)}%` }}
+                  style={{
+                    width: `${Math.min(100, (limitStats.chatsUsed / limitStats.dailyLimit) * 100)}%`,
+                  }}
                 />
               </div>
             </div>
-          )
-        )}
+          ))}
 
         {session ? (
           <div className="flex flex-col gap-2">
@@ -317,20 +348,22 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               }}
               className={cn(
                 "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-stone-50 hover:bg-stone-800 transition-colors",
-                isCollapsed && "justify-center"
+                isCollapsed && "justify-center",
               )}
             >
               <Settings size={18} className="text-stone-400" />
               {!isCollapsed && <span className="text-sm">Settings</span>}
             </button>
-            <div className={cn(
-              "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-stone-800 cursor-pointer transition-colors",
-              isCollapsed && "justify-center"
-            )}>
+            <div
+              className={cn(
+                "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-stone-800 cursor-pointer transition-colors",
+                isCollapsed && "justify-center",
+              )}
+            >
               {session.user.image ? (
-                <img 
-                  src={session.user.image} 
-                  alt={session.user.name} 
+                <img
+                  src={session.user.image}
+                  alt={session.user.name}
                   className="w-6 h-6 rounded-full"
                 />
               ) : (
@@ -338,26 +371,35 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               )}
               {!isCollapsed && (
                 <div className="flex flex-col min-w-0 flex-1">
-                  <span className="text-sm font-medium truncate">{session.user.name}</span>
+                  <span className="text-sm font-medium truncate">
+                    {session.user.name}
+                  </span>
                 </div>
               )}
               {!isCollapsed && (
                 <button onClick={handleAuth} title="Sign Out">
-                  <LogOut size={16} className="text-stone-400 hover:text-rose-500" />
+                  <LogOut
+                    size={16}
+                    className="text-stone-400 hover:text-rose-500"
+                  />
                 </button>
               )}
             </div>
           </div>
         ) : (
-          <button 
+          <button
             onClick={handleAuth}
             className={cn(
               "flex items-center gap-3 w-full px-3 py-2.5 rounded-full text-stone-50 hover:bg-stone-800 transition-colors",
-              isCollapsed && "justify-center"
+              isCollapsed && "justify-center",
             )}
           >
             <LogIn size={18} className="text-stone-400" />
-            {!isCollapsed && <span className="text-sm font-medium">{isPending ? "Loading..." : "Sign In"}</span>}
+            {!isCollapsed && (
+              <span className="text-sm font-medium">
+                {isPending ? "Loading..." : "Sign In"}
+              </span>
+            )}
           </button>
         )}
       </div>
@@ -379,9 +421,9 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       transition={{ duration: 0.2, ease: "easeInOut" }}
       className={cn(
         "h-[100dvh] hidden md:flex flex-col transition-all z-30 overflow-hidden",
-        isCollapsed 
-          ? "absolute left-0 top-0 bottom-0 bg-transparent backdrop-blur-none" 
-          : "relative bg-[#1C1917]/30 backdrop-blur-xl"
+        isCollapsed
+          ? "absolute left-0 top-0 bottom-0 bg-transparent backdrop-blur-none"
+          : "relative bg-[#1C1917]/30 backdrop-blur-xl",
       )}
     >
       {sidebarContent}

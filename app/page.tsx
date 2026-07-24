@@ -19,33 +19,34 @@ export default async function LandingPage() {
       {
         "@type": "WebSite",
         "@id": "https://darc.fun/#website",
-        "url": "https://darc.fun",
-        "name": "DARC | AI Dating & Relationship Coach",
-        "description": "AI-powered relationship coaching for the modern age.",
-        "publisher": {
+        url: "https://darc.fun",
+        name: "DARC | AI Dating & Relationship Coach",
+        description: "AI-powered relationship coaching for the modern age.",
+        publisher: {
           "@type": "Organization",
-          "name": "DARC",
-          "logo": {
+          name: "DARC",
+          logo: {
             "@type": "ImageObject",
-            "url": "https://darc.fun/darc-ai-logo.png"
-          }
-        }
+            url: "https://darc.fun/darc_logo.png",
+          },
+        },
       },
       {
         "@type": "SoftwareApplication",
         "@id": "https://darc.fun/#software",
-        "name": "DARC AI",
-        "applicationCategory": "HealthApplication",
-        "operatingSystem": "All",
-        "url": "https://darc.fun",
-        "offers": {
+        name: "DARC AI",
+        applicationCategory: "HealthApplication",
+        operatingSystem: "All",
+        url: "https://darc.fun",
+        offers: {
           "@type": "Offer",
-          "price": "0",
-          "priceCurrency": "USD"
+          price: "0",
+          priceCurrency: "USD",
         },
-        "description": "AI-powered relationship coaching, text analysis, and dating advice."
-      }
-    ]
+        description:
+          "AI-powered relationship coaching, text analysis, and dating advice.",
+      },
+    ],
   };
 
   return (

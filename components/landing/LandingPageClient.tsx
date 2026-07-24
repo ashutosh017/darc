@@ -32,7 +32,11 @@ export default function LandingPageClient() {
         const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
         tl.from(".hero-headline", { y: 40, autoAlpha: 0, duration: 1 })
           .from(".hero-sub", { y: 20, autoAlpha: 0, duration: 0.8 }, "-=0.5")
-          .from(".hero-cta-area", { y: 20, autoAlpha: 0, duration: 0.8 }, "-=0.4");
+          .from(
+            ".hero-cta-area",
+            { y: 20, autoAlpha: 0, duration: 0.8 },
+            "-=0.4",
+          );
 
         // Blobs animation
         gsap.to(".mesh-blob-1", {
@@ -126,24 +130,35 @@ export default function LandingPageClient() {
             ".trust-block",
             ".closing-cta",
           ],
-          { autoAlpha: 1, y: 0 }
+          { autoAlpha: 1, y: 0 },
         );
       });
     },
-    { scope: containerRef }
+    { scope: containerRef },
   );
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-[#0C0A09] text-stone-50 overflow-x-hidden font-sans">
+    <div
+      ref={containerRef}
+      className="min-h-screen bg-[#0C0A09] text-stone-50 overflow-x-hidden font-sans"
+    >
       {/* HEADER */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-          scrolled ? "bg-[#0C0A09]/80 backdrop-blur-xl border-b border-stone-800/50 py-3" : "bg-transparent py-5"
+          scrolled
+            ? "bg-[#0C0A09]/80 backdrop-blur-xl border-b border-stone-800/50 py-3"
+            : "bg-transparent py-5"
         }`}
       >
         <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-0">
-            <Image src="/darc-ai-logo.png" alt="DaRC Logo" width={48} height={48} className="rounded-lg" />
+            <Image
+              src="/darc_logo.png"
+              alt="DaRC Logo"
+              width={48}
+              height={48}
+              className="rounded-lg"
+            />
             <span className="font-bold tracking-tight text-xl">DARC</span>
           </Link>
           <Link
@@ -167,7 +182,9 @@ export default function LandingPageClient() {
               deserve better than guesswork
             </h1>
             <p className="hero-sub invisible text-lg text-stone-400 leading-relaxed max-w-2xl mx-auto mb-10">
-              DaRC is an AI coach trained in relationship psychology. Ask about texting anxiety, mixed signals, conflict resolution, or intimacy — and get advice that actually understands context.
+              DaRC is an AI coach trained in relationship psychology. Ask about
+              texting anxiety, mixed signals, conflict resolution, or intimacy —
+              and get advice that actually understands context.
             </p>
             <div className="hero-cta-area invisible flex flex-col items-center gap-4">
               <Link
@@ -176,7 +193,9 @@ export default function LandingPageClient() {
               >
                 Start a conversation
               </Link>
-              <p className="text-sm text-stone-500">Free. Private. Always confidential.</p>
+              <p className="text-sm text-stone-500">
+                Free. Private. Always confidential.
+              </p>
             </div>
           </div>
 
@@ -196,26 +215,48 @@ export default function LandingPageClient() {
           <div className="conv-card invisible bg-stone-900 rounded-2xl border border-stone-800 p-6 sm:p-8 flex flex-col gap-6 shadow-2xl shadow-black/50">
             {/* User Message */}
             <div className="bg-stone-800 text-stone-100 p-4 rounded-2xl rounded-br-md max-w-[85%] ml-auto text-sm sm:text-base leading-relaxed">
-              My partner and I keep having the same argument about how much time we spend together. Every time I bring it up, they get defensive and shut down. I don't know what to do anymore.
+              My partner and I keep having the same argument about how much time
+              we spend together. Every time I bring it up, they get defensive
+              and shut down. I don't know what to do anymore.
             </div>
 
             {/* DaRC Response */}
             <div className="bg-gradient-to-br from-stone-900 to-stone-800 border border-stone-800 border-l-amber-500/30 border-l-2 p-5 rounded-2xl rounded-bl-md max-w-[95%] text-stone-300 text-sm sm:text-base leading-relaxed space-y-4 shadow-inner">
               <p>
-                This pattern — where one person pursues and the other withdraws — is called the <strong className="text-stone-200 font-medium">pursue-withdraw cycle</strong>. It's one of the most common relationship dynamics, and the good news is it's very workable.
+                This pattern — where one person pursues and the other withdraws
+                — is called the{" "}
+                <strong className="text-stone-200 font-medium">
+                  pursue-withdraw cycle
+                </strong>
+                . It's one of the most common relationship dynamics, and the
+                good news is it's very workable.
               </p>
               <p>Here's what's likely happening:</p>
               <p>
-                Your partner isn't shutting down because they don't care. Withdrawal is often a <strong className="text-stone-200 font-medium">self-protection response</strong> when someone feels overwhelmed or fears they'll say something hurtful.
+                Your partner isn't shutting down because they don't care.
+                Withdrawal is often a{" "}
+                <strong className="text-stone-200 font-medium">
+                  self-protection response
+                </strong>{" "}
+                when someone feels overwhelmed or fears they'll say something
+                hurtful.
               </p>
               <div className="pt-4 mt-2 border-t border-stone-800/50">
                 <p className="mb-2">
-                  <strong className="text-stone-200 font-medium">Try this approach next time:</strong>
+                  <strong className="text-stone-200 font-medium">
+                    Try this approach next time:
+                  </strong>
                 </p>
                 <p className="mb-2">
-                  Instead of &quot;we need to talk about time together,&quot; which can trigger defensiveness, try leading with your feeling: &quot;I've been missing you lately. Can we find a time this week that's just for us?&quot;
+                  Instead of &quot;we need to talk about time together,&quot;
+                  which can trigger defensiveness, try leading with your
+                  feeling: &quot;I've been missing you lately. Can we find a
+                  time this week that's just for us?&quot;
                 </p>
-                <p>This reframes the conversation from a complaint to an invitation.</p>
+                <p>
+                  This reframes the conversation from a complaint to an
+                  invitation.
+                </p>
               </div>
             </div>
           </div>
@@ -257,8 +298,12 @@ export default function LandingPageClient() {
                 key={i}
                 className="cap-row invisible py-6 border-b border-stone-800 flex flex-col gap-1"
               >
-                <h3 className="text-stone-50 font-medium text-lg">{item.title}</h3>
-                <p className="text-stone-500 text-sm leading-relaxed">{item.desc}</p>
+                <h3 className="text-stone-50 font-medium text-lg">
+                  {item.title}
+                </h3>
+                <p className="text-stone-500 text-sm leading-relaxed">
+                  {item.desc}
+                </p>
               </div>
             ))}
           </div>
@@ -273,23 +318,34 @@ export default function LandingPageClient() {
             <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
               <div className="trust-block invisible flex flex-col gap-4">
                 <div className="w-12 h-[2px] bg-amber-500 rounded-full"></div>
-                <h3 className="text-xl font-medium text-stone-50">Psychology, not platitudes</h3>
+                <h3 className="text-xl font-medium text-stone-50">
+                  Psychology, not platitudes
+                </h3>
                 <p className="text-stone-400 leading-relaxed text-sm">
-                  Every response draws from attachment theory, Gottman method principles, and CBT-informed communication frameworks. Not fortune cookie advice.
+                  Every response draws from attachment theory, Gottman method
+                  principles, and CBT-informed communication frameworks. Not
+                  fortune cookie advice.
                 </p>
               </div>
               <div className="trust-block invisible flex flex-col gap-4">
                 <div className="w-12 h-[2px] bg-rose-500 rounded-full"></div>
-                <h3 className="text-xl font-medium text-stone-50">Your context matters</h3>
+                <h3 className="text-xl font-medium text-stone-50">
+                  Your context matters
+                </h3>
                 <p className="text-stone-400 leading-relaxed text-sm">
-                  DaRC remembers what you've shared in a conversation and tailors advice to your specific situation, relationship history, and goals.
+                  DaRC remembers what you've shared in a conversation and
+                  tailors advice to your specific situation, relationship
+                  history, and goals.
                 </p>
               </div>
               <div className="trust-block invisible flex flex-col gap-4">
                 <div className="w-12 h-[2px] bg-violet-500 rounded-full"></div>
-                <h3 className="text-xl font-medium text-stone-50">Completely private</h3>
+                <h3 className="text-xl font-medium text-stone-50">
+                  Completely private
+                </h3>
                 <p className="text-stone-400 leading-relaxed text-sm">
-                  Your conversations are encrypted and anonymous. No human ever reads them. Delete everything at any time.
+                  Your conversations are encrypted and anonymous. No human ever
+                  reads them. Delete everything at any time.
                 </p>
               </div>
             </div>
@@ -319,10 +375,18 @@ export default function LandingPageClient() {
       <footer className="border-t border-stone-800 py-8 px-6">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-stone-600">
           <div className="flex items-center gap-0">
-            <Image src="/darc-ai-logo.png" alt="DaRC Logo" width={36} height={36} className="rounded-md opacity-50" />
+            <Image
+              src="/darc_logo.png"
+              alt="DaRC Logo"
+              width={36}
+              height={36}
+              className="rounded-md opacity-50"
+            />
             <span className="font-semibold tracking-tight">DARC</span>
           </div>
-          <div className="text-center">Conversations are encrypted and anonymous.</div>
+          <div className="text-center">
+            Conversations are encrypted and anonymous.
+          </div>
           <div>© {new Date().getFullYear()}</div>
         </div>
       </footer>
