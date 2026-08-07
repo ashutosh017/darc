@@ -8,7 +8,7 @@ import {
   X,
   LogOut,
   LogIn,
-  Settings,
+  SlidersHorizontal,
   MoreVertical,
   Share2,
   Pencil,
@@ -269,70 +269,72 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
       <div className="mt-auto p-3 border-t border-stone-800/30 flex flex-col gap-2 shrink-0">
         {/* Daily Limit Stats */}
         {limitStats &&
-          (isCollapsed ? (
-            <div
-              className="flex justify-center py-2 cursor-default select-none shrink-0"
-              title={`Daily Limit: ${limitStats.chatsUsed}/${limitStats.dailyLimit} chats used`}
-            >
-              <div className="relative w-10 h-10 flex items-center justify-center">
-                <svg className="w-10 h-10">
-                  <defs>
-                    <linearGradient
-                      id="limitRingGradient"
-                      x1="0%"
-                      y1="0%"
-                      x2="100%"
-                      y2="100%"
-                    >
-                      <stop offset="0%" stopColor="amber-500" />
-                      <stop offset="100%" stopColor="rose-500" />
-                    </linearGradient>
-                  </defs>
-                  <circle
-                    cx="20"
-                    cy="20"
-                    r="16"
-                    className="stroke-stone-800/30"
-                    strokeWidth="2.5"
-                    fill="transparent"
-                  />
-                  <circle
-                    cx="20"
-                    cy="20"
-                    r="16"
-                    stroke="url(#limitRingGradient)"
-                    strokeWidth="2.5"
-                    fill="transparent"
-                    strokeDasharray={100.5}
-                    strokeDashoffset={
-                      100.5 -
-                      (100.5 *
-                        Math.min(limitStats.chatsUsed, limitStats.dailyLimit)) /
-                        limitStats.dailyLimit
-                    }
-                    strokeLinecap="round"
-                    className="transform -rotate-90 origin-center"
-                    style={{ transition: "stroke-dashoffset 0.3s ease" }}
-                  />
-                </svg>
-                <span className="absolute text-[10px] font-bold text-stone-50">
-                  {limitStats.chatsUsed}
-                </span>
+          (isCollapsed ? (() => {
+            const remaining = Math.max(0, limitStats.dailyLimit - limitStats.chatsUsed);
+            const pct = remaining / limitStats.dailyLimit;
+            const circumference = 2 * Math.PI * 16; // r=16
+            return (
+              <div
+                className="flex justify-center py-2 cursor-default select-none shrink-0"
+                title={`${remaining} of ${limitStats.dailyLimit} prompts remaining`}
+              >
+                <div className="relative w-10 h-10 flex items-center justify-center">
+                  <svg className="w-10 h-10" viewBox="0 0 40 40">
+                    <defs>
+                      <linearGradient
+                        id="limitRingGradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="100%"
+                      >
+                        <stop offset="0%" stopColor="#f59e0b" />
+                        <stop offset="100%" stopColor="#f43f5e" />
+                      </linearGradient>
+                    </defs>
+                    {/* Background track */}
+                    <circle
+                      cx="20"
+                      cy="20"
+                      r="16"
+                      className="stroke-stone-800/40"
+                      strokeWidth="2.5"
+                      fill="transparent"
+                    />
+                    {/* Remaining ring — depletes as prompts are used */}
+                    <circle
+                      cx="20"
+                      cy="20"
+                      r="16"
+                      stroke={remaining === 0 ? "#44403c" : "url(#limitRingGradient)"}
+                      strokeWidth="2.5"
+                      fill="transparent"
+                      strokeDasharray={circumference}
+                      strokeDashoffset={circumference - circumference * pct}
+                      strokeLinecap="round"
+                      className="transform -rotate-90 origin-center"
+                      style={{ transition: "stroke-dashoffset 0.3s ease" }}
+                    />
+                  </svg>
+                  <span className={`absolute text-[11px] font-bold ${remaining === 0 ? "text-stone-500" : "text-stone-50"}`}>
+                    {remaining}
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : (
+            );
+          })() : (
             <div className="px-4 py-3 bg-stone-900 border border-stone-800/20 rounded-2xl flex flex-col gap-2 select-none">
               <div className="flex items-center justify-between text-xs">
-                <span className="text-stone-400 font-medium">Daily Limit</span>
+                <span className="text-stone-400 font-medium">Remaining</span>
                 <span className="text-amber-500 font-bold">
-                  {limitStats.chatsUsed}/{limitStats.dailyLimit}
+                  {Math.max(0, limitStats.dailyLimit - limitStats.chatsUsed)}/{limitStats.dailyLimit}
                 </span>
               </div>
               <div className="w-full bg-stone-800/30 h-1.5 rounded-full overflow-hidden">
                 <div
                   className="bg-gradient-to-r from-amber-500 to-rose-500 h-full rounded-full transition-all duration-300"
                   style={{
-                    width: `${Math.min(100, (limitStats.chatsUsed / limitStats.dailyLimit) * 100)}%`,
+                    width: `${Math.min(100, ((limitStats.dailyLimit - limitStats.chatsUsed) / limitStats.dailyLimit) * 100)}%`,
                   }}
                 />
               </div>
@@ -351,10 +353,14 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                 isCollapsed && "justify-center",
               )}
             >
-              <Settings size={18} className="text-stone-400" />
+              <SlidersHorizontal size={18} className="text-stone-400" />
               {!isCollapsed && <span className="text-sm">Settings</span>}
             </button>
             <div
+              onClick={() => {
+                router.push("/profile");
+                if (isMobile) onClose?.();
+              }}
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-full hover:bg-stone-800 cursor-pointer transition-colors",
                 isCollapsed && "justify-center",
@@ -377,7 +383,13 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
                 </div>
               )}
               {!isCollapsed && (
-                <button onClick={handleAuth} title="Sign Out">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleAuth();
+                  }}
+                  title="Sign Out"
+                >
                   <LogOut
                     size={16}
                     className="text-stone-400 hover:text-rose-500"

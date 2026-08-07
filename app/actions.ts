@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { Role } from "@/lib/generated/prisma";
 import { GoogleGenAI } from "@google/genai";
+import { GEMINI_3_1_FLASH_LITE } from "@/lib/models";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -24,7 +25,7 @@ export async function createChat(title?: string) {
       const apiKey = process.env.GEMINI_API_KEY;
       const ai = new GoogleGenAI({ apiKey });
       const gen_title = await ai.models.generateContent({
-        model: "gemini-3.1-flash-lite",
+        model: GEMINI_3_1_FLASH_LITE,
         contents: `Create a short, concise, min(2 words) max(10 words) title for a relationship chat started with this message: "${title}". Return ONLY the title text, with no quotes, prefixes, or punctuation.`,
       });
       if (gen_title?.text) {
@@ -156,6 +157,7 @@ export async function saveUserProfile(data: {
 
   const updateData: Record<string, string | number | null | boolean | Date> = {
     profilePrompted: true,
+    profileSummary: "",
   };
 
   if (data) {
@@ -249,6 +251,7 @@ export async function getUserProfile() {
       instaUrl: true,
       linkedinUrl: true,
       xUrl: true,
+      profileSummary: true,
     },
   });
 }

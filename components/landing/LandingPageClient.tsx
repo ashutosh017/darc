@@ -106,6 +106,19 @@ export default function LandingPageClient() {
           ease: "power2.out",
         });
 
+        gsap.from(".pricing-card", {
+          scrollTrigger: {
+            trigger: ".pricing-section",
+            start: "top 80%",
+            once: true,
+          },
+          y: 30,
+          autoAlpha: 0,
+          stagger: 0.15,
+          duration: 0.8,
+          ease: "power2.out",
+        });
+
         gsap.from(".closing-cta", {
           scrollTrigger: {
             trigger: ".closing-section",
@@ -128,6 +141,7 @@ export default function LandingPageClient() {
             ".conv-card",
             ".cap-row",
             ".trust-block",
+            ".pricing-card",
             ".closing-cta",
           ],
           { autoAlpha: 1, y: 0 },
@@ -349,6 +363,95 @@ export default function LandingPageClient() {
                 </p>
               </div>
             </div>
+          </div>
+        </section>
+
+        {/* PRICING SECTION */}
+        <section className="pricing-section py-24 px-6">
+          <div className="max-w-5xl mx-auto">
+            <p className="text-xs uppercase tracking-[0.2em] text-stone-500 font-medium text-center mb-4">
+              Simple Pricing
+            </p>
+            <h2 className="text-3xl lg:text-4xl font-medium text-stone-50 text-center mb-4">
+              Level up your relationships
+            </h2>
+            <p className="text-stone-400 text-center max-w-lg mx-auto mb-16">
+              Choose a plan that works for you. Cancel anytime.
+            </p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
+              {/* Monthly Plan */}
+              <div className="pricing-card invisible group relative rounded-2xl border border-stone-800 bg-stone-900/50 p-8 flex flex-col transition-all duration-300 hover:border-stone-700 hover:bg-stone-900/80">
+                <p className="text-xs uppercase tracking-[0.15em] text-stone-500 font-medium mb-6">
+                  Monthly
+                </p>
+                <div className="flex items-baseline gap-1 mb-2">
+                  <span className="text-5xl font-semibold text-stone-50 tracking-tight">$5</span>
+                  <span className="text-stone-500 text-sm">/month</span>
+                </div>
+                <p className="text-stone-500 text-sm mb-8">
+                  Great for getting started
+                </p>
+                <ul className="flex flex-col gap-4 mb-10 flex-1">
+                  <li className="flex items-start gap-3 text-sm text-stone-300">
+                    <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    50 chats per day
+                  </li>
+                  <li className="flex items-start gap-3 text-sm text-stone-300">
+                    <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                    Access to new upcoming features
+                  </li>
+                </ul>
+                <Link
+                  href="/chat"
+                  className="inline-flex items-center justify-center w-full px-6 py-3.5 rounded-full border border-stone-700 text-stone-200 font-medium hover:bg-stone-800 hover:border-stone-600 transition-all text-sm"
+                >
+                  Get Started
+                </Link>
+              </div>
+
+              {/* Yearly Plan — Recommended */}
+              <div className="pricing-card invisible group relative rounded-2xl p-[1px] bg-gradient-to-b from-amber-500/60 via-rose-500/30 to-transparent">
+                <div className="relative rounded-2xl bg-stone-900 p-8 flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-6">
+                    <p className="text-xs uppercase tracking-[0.15em] text-stone-500 font-medium">
+                      Yearly
+                    </p>
+                    <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[11px] font-semibold uppercase tracking-wider">
+                      Save 50%
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-1 mb-2">
+                    <span className="text-5xl font-semibold text-stone-50 tracking-tight">$30</span>
+                    <span className="text-stone-500 text-sm">/year</span>
+                  </div>
+                  <p className="text-stone-500 text-sm mb-8">
+                    Best value for serious growth
+                  </p>
+                  <ul className="flex flex-col gap-4 mb-10 flex-1">
+                    <li className="flex items-start gap-3 text-sm text-stone-300">
+                      <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                      100 chats per day
+                    </li>
+                    <li className="flex items-start gap-3 text-sm text-stone-300">
+                      <svg className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
+                      Early access to new upcoming features
+                    </li>
+                  </ul>
+                  <Link
+                    href="/chat"
+                    className="inline-flex items-center justify-center w-full px-6 py-3.5 rounded-full bg-amber-500 text-[#0C0A09] font-semibold hover:bg-amber-400 transition-all text-sm"
+                  >
+                    Get Started
+                  </Link>
+                </div>
+              </div>
+            </div>
+
+            {/* Policy Note */}
+            <p className="text-center text-stone-600 text-xs mt-10">
+              No returns on online purchases.
+            </p>
           </div>
         </section>
 

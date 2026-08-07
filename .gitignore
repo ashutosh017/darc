@@ -43,3 +43,4 @@ darc-execution.log
 next-env.d.ts
 
 /lib/generated/prisma
+/spec

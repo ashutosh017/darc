@@ -2,7 +2,7 @@
 
 /* eslint-disable react-hooks/set-state-in-effect */
 
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useRef, useEffect, useCallback, startTransition } from "react";
 import { ChatInput } from "@/components/ChatInput";
 import { ChatMessage } from "@/components/ChatMessage";
 import { ChatHero, TypingIndicator } from "@/components/ChatStatus";
@@ -22,6 +22,7 @@ import {
 import { useChat } from "@/lib/chat-context";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ProfilePromptModal } from "@/components/ProfilePromptModal";
+import type { StreamEvent } from "@/app/api/chat/v2/graph";
 
 interface Message {
   id: string;
@@ -43,6 +44,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [isTyping, setIsTyping] = useState(false);
+  const [typingStatus, setTypingStatus] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoadingMessages, setIsLoadingMessages] = useState(
     chatId !== null && chatId !== "undefined" && chatId !== "null"
@@ -127,7 +129,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         );
 
         // 3. Hit chat API with message and chatId
-        const response = await fetch("/api/chat/v1", {
+        const response = await fetch("/api/chat/v2", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -178,37 +180,103 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         refreshLimitStats();
 
         const coachMessageId = "temp-" + Date.now();
-        const coachMessage: Message = {
-          id: coachMessageId,
-          role: "DARC",
-          text: "",
-          isComplete: false,
-        };
-
-        setMessages((prev) => [...prev, coachMessage]);
-        setIsTyping(false);
-
         const reader = response.body?.getReader();
         const decoder = new TextDecoder();
 
         if (!reader) throw new Error("No reader available");
 
         let fullCoachText = "";
+        let coachMsgCreated = false;
+        let buffer = "";
+
+        // Streaming buffer: accumulate tokens in a ref-like variable
+        // and flush to React state via requestAnimationFrame for smooth rendering
+        let pendingText = "";
+        let rafId: number | null = null;
+
+        const flushPendingText = () => {
+          rafId = null;
+          if (!pendingText) return;
+          const textToFlush = pendingText;
+          pendingText = "";
+          startTransition(() => {
+            setMessages((prev) =>
+              prev.map((msg) =>
+                msg.id === coachMessageId
+                  ? { ...msg, text: msg.text + textToFlush }
+                  : msg,
+              ),
+            );
+          });
+        };
+
         while (true) {
           const { value, done: doneReading } = await reader.read();
           if (doneReading) break;
 
-          const chunkValue = decoder.decode(value, { stream: true });
-          fullCoachText += chunkValue;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n\n");
+          buffer = lines.pop() || "";
 
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed.startsWith("data: ")) continue;
+            const eventDataStr = trimmed.slice(6);
+            try {
+              const event: StreamEvent = JSON.parse(eventDataStr);
+              if (event.type === "text") {
+                if (event.content) {
+                  fullCoachText += event.content;
+
+                  if (!coachMsgCreated && fullCoachText.trim().length > 0) {
+                    coachMsgCreated = true;
+                    setIsTyping(false);
+                    setTypingStatus("");
+                    setMessages((prev) => [
+                      ...prev,
+                      {
+                        id: coachMessageId,
+                        role: "DARC",
+                        text: fullCoachText,
+                        isComplete: false,
+                      },
+                    ]);
+                    pendingText = "";
+                  } else if (coachMsgCreated) {
+                    pendingText += event.content;
+                    if (rafId === null) {
+                      rafId = requestAnimationFrame(flushPendingText);
+                    }
+                  }
+                }
+              } else if (event.type === "error") {
+                throw new Error(event.error);
+              }
+            } catch (pErr) {
+              if (pErr instanceof Error && pErr.message !== "Unexpected token") {
+                throw pErr;
+              }
+            }
+          }
+        }
+
+        // Flush any remaining buffered text after stream ends
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+        }
+        if (pendingText) {
           setMessages((prev) =>
             prev.map((msg) =>
               msg.id === coachMessageId
-                ? { ...msg, text: msg.text + chunkValue }
+                ? { ...msg, text: msg.text + pendingText }
                 : msg,
             ),
           );
+          pendingText = "";
         }
+
+        setIsTyping(false);
+        setTypingStatus("");
 
         // 4. Save Coach Message to DB
         const savedCoachMsg = await saveMessage(
@@ -324,18 +392,24 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
     }
   }, [initMsg, localChatId, handleSendMessage]);
 
-  const scrollToBottom = () => {
-    if (scrollRef.current) {
+  const scrollThrottleRef = useRef(false);
+
+  const scrollToBottom = useCallback(() => {
+    if (scrollRef.current && !scrollThrottleRef.current) {
+      scrollThrottleRef.current = true;
       scrollRef.current.scrollTo({
         top: scrollRef.current.scrollHeight,
-        behavior: "smooth",
+        behavior: "instant",
       });
+      setTimeout(() => {
+        scrollThrottleRef.current = false;
+      }, 150);
     }
-  };
+  }, []);
 
   useEffect(() => {
     scrollToBottom();
-  }, [messages, isTyping]);
+  }, [messages, isTyping, scrollToBottom]);
 
   if (isSessionPending) return null;
 
@@ -413,7 +487,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
                   })}
                   {isTyping && (
                     <div className="flex flex-col">
-                      <TypingIndicator key="typing" />
+                      <TypingIndicator key="typing" status={typingStatus} />
                       <p className="md:hidden text-left text-[11px] text-stone-500 -mt-4 mb-8 px-0 select-none leading-relaxed">
                         DARC may display inaccurate info, so double-check its coaching insights.
                       </p>

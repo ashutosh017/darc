@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useSession } from "@/lib/auth-client";
 
 export function ChatHero() {
@@ -31,56 +31,68 @@ export function ChatHero() {
   );
 }
 
-export function TypingIndicator() {
+export function TypingIndicator({ status }: { status?: string }) {
   const [statusIndex, setStatusIndex] = React.useState(0);
-  const statuses = [
-    "Analyzing your situation...",
-    "Retrieving relationship database insights...",
-    "Synthesizing personal guidance...",
-    "Formulating response..."
-  ];
+  const humanStatuses = React.useMemo(
+    () => [
+      "Hmm, let me think about this...",
+      "Looking through my notes...",
+      "Alright, here's what I think...",
+    ],
+    []
+  );
+
+  const currentStatus = status || humanStatuses[statusIndex];
 
   React.useEffect(() => {
+    if (status) return;
     const interval = setInterval(() => {
-      setStatusIndex((prev) => (prev < statuses.length - 1 ? prev + 1 : prev));
-    }, 4000);
+      setStatusIndex((prev) => (prev < humanStatuses.length - 1 ? prev + 1 : prev));
+    }, 2500);
     return () => clearInterval(interval);
-  }, []);
+  }, [status, humanStatuses.length]);
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="flex flex-col gap-3.5 mb-8 pl-1"
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className="flex items-center gap-3 mb-8 pl-1"
     >
-      <div className="flex items-center gap-3">
-        {/* Glowing Spinner */}
-        <div className="relative w-4.5 h-4.5 flex items-center justify-center shrink-0">
-          <div className="absolute inset-0 rounded-full border-2 border-t-transparent border-amber-500 animate-spin" />
-          <div className="absolute inset-0 rounded-full border-2 border-amber-500/15 animate-pulse" />
-        </div>
-
-        {/* Status Text */}
-        <span className="text-sm font-medium text-stone-400/90 tracking-wide select-none">
-          {statuses[statusIndex]}
-        </span>
-      </div>
-
-      {/* Typing dots */}
-      <div className="flex items-center gap-1.5 pl-7.5">
-        {[0, 1, 2].map((i) => (
-          <motion.div
+      {/* Animated Bars — minimal equalizer / waveform */}
+      <div className="flex items-center gap-[3px] h-4">
+        {[0, 1, 2, 3].map((i) => (
+          <motion.span
             key={i}
-            animate={{ opacity: [0.3, 1, 0.3] }}
-            transition={{ 
-              duration: 1.5, 
-              repeat: Infinity, 
-              delay: i * 0.2,
-              ease: "easeInOut"
+            className="w-[2.5px] rounded-full bg-amber-500/70"
+            animate={{
+              height: ["4px", "16px", "8px", "14px", "4px"],
+              opacity: [0.5, 1, 0.7, 1, 0.5],
             }}
-            className="w-1.5 h-1.5 rounded-full bg-amber-500/80"
+            transition={{
+              duration: 1.6,
+              repeat: Infinity,
+              delay: i * 0.15,
+              ease: "easeInOut",
+            }}
           />
         ))}
+      </div>
+
+      {/* Status Label — clean crossfade */}
+      <div className="relative h-5 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={currentStatus}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            className="block text-[13px] font-medium text-stone-500 tracking-wide select-none"
+          >
+            {currentStatus}
+          </motion.span>
+        </AnimatePresence>
       </div>
     </motion.div>
   );

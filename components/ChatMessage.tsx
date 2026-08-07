@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, memo } from "react";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { Copy, Check, ThumbsUp, ThumbsDown } from "lucide-react";
-import ReactMarkdown from "react-markdown";
+import { StreamingText } from "./StreamingText";
 
 interface ChatMessageProps {
   role: "user" | "coach";
@@ -12,7 +11,7 @@ interface ChatMessageProps {
   isComplete?: boolean;
 }
 
-export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
+export const ChatMessage = memo(function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
   const isCoach = role === "coach";
   const [copied, setCopied] = useState(false);
   const [feedback, setFeedback] = useState<"up" | "down" | null>(null);
@@ -37,27 +36,11 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
         <div className={cn(
           "text-[16px] leading-[1.65]",
           isCoach 
-            ? "bg-gradient-to-br from-stone-900 to-stone-800 border border-stone-800 border-l-amber-500/30 border-l-2 text-stone-300 rounded-2xl rounded-bl-md shadow-inner px-6 py-5 w-full" 
+            ? "bg-transparent text-stone-300 py-1 w-full" 
             : "bg-stone-800 text-stone-100 rounded-2xl rounded-br-md px-6 py-3.5 inline-block max-w-full shadow-sm whitespace-pre-wrap"
         )}>
           {isCoach ? (
-            <ReactMarkdown
-              components={{
-                p: ({ children }) => <p className="mb-4 last:mb-0">{children}</p>,
-                strong: ({ children }) => <strong className="font-semibold text-white">{children}</strong>,
-                em: ({ children }) => <em className="italic">{children}</em>,
-                ul: ({ children }) => <ul className="list-disc pl-6 mb-4 space-y-1">{children}</ul>,
-                ol: ({ children }) => <ol className="list-decimal pl-6 mb-4 space-y-1">{children}</ol>,
-                li: ({ children }) => <li className="text-stone-300">{children}</li>,
-                h1: ({ children }) => <h1 className="text-xl font-bold mb-4 mt-6 text-stone-50">{children}</h1>,
-                h2: ({ children }) => <h2 className="text-lg font-bold mb-3 mt-5 text-stone-50">{children}</h2>,
-                h3: ({ children }) => <h3 className="text-base font-bold mb-2 mt-4 text-stone-50">{children}</h3>,
-                code: ({ children }) => <code className="bg-stone-800 px-1.5 py-0.5 rounded text-sm font-mono text-amber-500">{children}</code>,
-                pre: ({ children }) => <pre className="bg-stone-900 p-4 rounded-xl border border-stone-800 overflow-x-auto my-4 font-mono text-sm">{children}</pre>,
-              }}
-            >
-              {content}
-            </ReactMarkdown>
+            <StreamingText content={content} isComplete={isComplete} />
           ) : (
             content
           )}
@@ -67,39 +50,54 @@ export function ChatMessage({ role, content, isComplete }: ChatMessageProps) {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="flex items-center gap-2 mt-5"
+            transition={{ delay: 0.2 }}
+            className="flex items-center gap-1 mt-3"
           >
             <button
               onClick={() => setFeedback(feedback === "up" ? null : "up")}
               className={cn(
-                "p-2.5 rounded-full transition-colors hover:bg-stone-800",
-                feedback === "up" ? "text-amber-500 bg-amber-500/10" : "text-stone-400"
+                "p-2 rounded-lg transition-all duration-200 hover:bg-stone-800/60",
+                feedback === "up" ? "text-amber-400" : "text-stone-600 hover:text-stone-400"
               )}
-              title="Good response"
+              title="Helpful"
             >
-              <ThumbsUp size={16} />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 10v12"/>
+                <path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>
+              </svg>
             </button>
             <button
               onClick={() => setFeedback(feedback === "down" ? null : "down")}
               className={cn(
-                "p-2.5 rounded-full transition-colors hover:bg-stone-800",
-                feedback === "down" ? "text-rose-500 bg-rose-500/10" : "text-stone-400"
+                "p-2 rounded-lg transition-all duration-200 hover:bg-stone-800/60",
+                feedback === "down" ? "text-rose-400" : "text-stone-600 hover:text-stone-400"
               )}
-              title="Bad response"
+              title="Not helpful"
             >
-              <ThumbsDown size={16} />
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M17 14V2"/>
+                <path d="M9 18.12 10 14H4.17a2 2 0 0 1-1.92-2.56l2.33-8A2 2 0 0 1 6.5 2H20a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.76a2 2 0 0 0-1.79 1.11L12 22a3.13 3.13 0 0 1-3-3.88Z"/>
+              </svg>
             </button>
-            <div className="w-px h-4 bg-stone-700 mx-1.5" />
             <button
               onClick={copyMessage}
-              className="flex items-center gap-2 p-2.5 rounded-full text-stone-400 hover:bg-stone-800 transition-colors"
-              title="Copy response"
+              className="p-2 rounded-lg text-stone-600 hover:text-stone-400 hover:bg-stone-800/60 transition-all duration-200"
+              title="Copy"
             >
-              {copied ? <Check size={16} className="text-amber-500" /> : <Copy size={16} />}
+              {copied ? (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+                  <path d="M20 6 9 17l-5-5"/>
+                </svg>
+              ) : (
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <rect width="14" height="14" x="8" y="8" rx="2" ry="2"/>
+                  <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>
+                </svg>
+              )}
             </button>
           </motion.div>
         )}
       </div>
     </motion.div>
   );
-}
+});

@@ -42,6 +42,8 @@ model User {
   xUrl              String?
   profilePrompted   Boolean   @default(false)
 
+  profileSummary String @default("")
+
   @@map("user")
 }
 
