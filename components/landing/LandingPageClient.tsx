@@ -381,15 +381,15 @@ export default function LandingPageClient() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
               {/* Monthly Plan */}
-              <div className="pricing-card invisible group relative rounded-2xl border border-stone-800 bg-stone-900/50 p-8 flex flex-col transition-all duration-300 hover:border-stone-700 hover:bg-stone-900/80">
-                <p className="text-xs uppercase tracking-[0.15em] text-stone-500 font-medium mb-6">
+              <div className="pricing-card invisible group relative rounded-2xl border border-stone-700/60 bg-[#1C1917] p-8 flex flex-col transition-all duration-300 hover:border-stone-600 hover:bg-[#1F1C1A]">
+                <p className="text-xs uppercase tracking-[0.15em] text-stone-400 font-medium mb-6">
                   Monthly
                 </p>
                 <div className="flex items-baseline gap-1 mb-2">
                   <span className="text-5xl font-semibold text-stone-50 tracking-tight">$5</span>
-                  <span className="text-stone-500 text-sm">/month</span>
+                  <span className="text-stone-400 text-sm">/month</span>
                 </div>
-                <p className="text-stone-500 text-sm mb-8">
+                <p className="text-stone-400 text-sm mb-8">
                   Great for getting started
                 </p>
                 <ul className="flex flex-col gap-4 mb-10 flex-1">
@@ -404,17 +404,17 @@ export default function LandingPageClient() {
                 </ul>
                 <Link
                   href="/chat"
-                  className="inline-flex items-center justify-center w-full px-6 py-3.5 rounded-full border border-stone-700 text-stone-200 font-medium hover:bg-stone-800 hover:border-stone-600 transition-all text-sm"
+                  className="inline-flex items-center justify-center w-full px-6 py-3.5 rounded-full border border-stone-600 text-stone-200 font-medium hover:bg-stone-800 hover:border-stone-500 transition-all text-sm"
                 >
                   Get Started
                 </Link>
               </div>
 
               {/* Yearly Plan — Recommended */}
-              <div className="pricing-card invisible group relative rounded-2xl p-[1px] bg-gradient-to-b from-amber-500/60 via-rose-500/30 to-transparent">
-                <div className="relative rounded-2xl bg-stone-900 p-8 flex flex-col h-full">
+              <div className="pricing-card invisible group relative rounded-2xl p-[1px] bg-gradient-to-b from-amber-500/60 via-rose-500/30 to-stone-700/30">
+                <div className="relative rounded-2xl bg-[#1C1917] p-8 flex flex-col h-full">
                   <div className="flex items-center justify-between mb-6">
-                    <p className="text-xs uppercase tracking-[0.15em] text-stone-500 font-medium">
+                    <p className="text-xs uppercase tracking-[0.15em] text-stone-400 font-medium">
                       Yearly
                     </p>
                     <span className="px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-500 text-[11px] font-semibold uppercase tracking-wider">
@@ -423,9 +423,9 @@ export default function LandingPageClient() {
                   </div>
                   <div className="flex items-baseline gap-1 mb-2">
                     <span className="text-5xl font-semibold text-stone-50 tracking-tight">$30</span>
-                    <span className="text-stone-500 text-sm">/year</span>
+                    <span className="text-stone-400 text-sm">/year</span>
                   </div>
-                  <p className="text-stone-500 text-sm mb-8">
+                  <p className="text-stone-400 text-sm mb-8">
                     Best value for serious growth
                   </p>
                   <ul className="flex flex-col gap-4 mb-10 flex-1">
