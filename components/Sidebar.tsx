@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import {
   Plus,
   User,
-  X,
+  PanelLeftClose,
   LogOut,
   LogIn,
   SlidersHorizontal,
@@ -129,7 +129,7 @@ export function Sidebar({ isMobile, onClose }: SidebarProps) {
               }
               className="p-2 text-stone-400 hover:text-stone-50 hover:bg-stone-800 rounded-full transition-colors"
             >
-              <X size={24} />
+              <PanelLeftClose size={20} />
             </button>
           </>
         )}

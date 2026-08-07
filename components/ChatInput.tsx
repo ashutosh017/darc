@@ -78,9 +78,6 @@ export function ChatInput({
           </div>
         </div>
       </div>
-      <p className="hidden md:block text-center text-[11px] text-stone-500 mt-3 px-4">
-        DARC may display inaccurate info, so double-check its coaching insights.
-      </p>
     </div>
   );
 }

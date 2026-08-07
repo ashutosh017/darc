@@ -477,20 +477,12 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
                           content={message.text}
                           isComplete={message.isComplete}
                         />
-                        {isLast && !isTyping && (
-                          <p className="md:hidden text-left text-[11px] text-stone-500 -mt-6 mb-8 px-0 select-none leading-relaxed">
-                            DARC may display inaccurate info, so double-check its coaching insights.
-                          </p>
-                        )}
                       </div>
                     );
                   })}
                   {isTyping && (
                     <div className="flex flex-col">
                       <TypingIndicator key="typing" status={typingStatus} />
-                      <p className="md:hidden text-left text-[11px] text-stone-500 -mt-4 mb-8 px-0 select-none leading-relaxed">
-                        DARC may display inaccurate info, so double-check its coaching insights.
-                      </p>
                     </div>
                   )}
                 </div>
