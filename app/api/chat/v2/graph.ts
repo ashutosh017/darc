@@ -9,7 +9,7 @@ import {
   getUserProfileContext,
   processQueryAndGenerateSearchQuery,
 } from "@/lib/coaching";
-import { GEMMA_4_31B_IT } from "@/lib/models";
+import { GEMINI_2_5_FLASH } from "@/lib/models";
 import { User } from "@/lib/generated/prisma";
 
 export type StreamEvent =
@@ -101,6 +101,27 @@ async function loadHistoryNode(state: GraphStateType) {
       if (!hasCurrentMessage) {
         contents.push({ role: "user", parts: [{ text: message }] });
       }
+
+      // Normalize turns to ensure valid alternating user <-> model roles
+      const normalizedContents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+      for (const item of contents) {
+        if (normalizedContents.length === 0) {
+          if (item.role === "user") {
+            normalizedContents.push(item);
+          }
+        } else {
+          const prev = normalizedContents[normalizedContents.length - 1];
+          if (prev.role === item.role) {
+            prev.parts[0].text += `\n${item.parts[0].text}`;
+          } else {
+            normalizedContents.push(item);
+          }
+        }
+      }
+      contents =
+        normalizedContents.length > 0
+          ? normalizedContents
+          : [{ role: "user", parts: [{ text: message }] }];
     } else {
       contents = [{ role: "user", parts: [{ text: message }] }];
     }
@@ -290,7 +311,7 @@ async function generateResponseNode(
 
   try {
     const streamResponse = await ai.models.generateContentStream({
-      model: GEMMA_4_31B_IT,
+      model: GEMINI_2_5_FLASH,
       contents,
       config: {
         systemInstruction: dynamicSystemInstruction,

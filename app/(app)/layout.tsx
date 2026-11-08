@@ -16,7 +16,9 @@ export default function AppLayout({
 
     const handleResize = () => {
       // Set the height to match the actual visual viewport (excluding keyboard)
-      setViewportHeight(`${window.visualViewport.height}px`);
+      if (window.visualViewport) {
+        setViewportHeight(`${window.visualViewport.height}px`);
+      }
     };
 
     window.visualViewport.addEventListener("resize", handleResize);

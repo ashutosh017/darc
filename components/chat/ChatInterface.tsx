@@ -31,6 +31,90 @@ interface Message {
   isComplete?: boolean;
 }
 
+/**
+ * Safely parses raw/nested error strings (such as Google GenAI JSON errors)
+ * into friendly, readable coaching messages.
+ */
+function formatChatErrorMessage(rawError: unknown): string {
+  if (!rawError) return "Connection interrupted. Please try rephrasing your relationship query.";
+
+  let str =
+    typeof rawError === "string"
+      ? rawError
+      : rawError instanceof Error
+      ? rawError.message
+      : JSON.stringify(rawError);
+
+  // Unpack iteratively in case of nested JSON stringification
+  for (let i = 0; i < 3; i++) {
+    const trimmed = str.trim();
+    if (
+      (trimmed.startsWith("{") && trimmed.endsWith("}")) ||
+      (trimmed.startsWith("[") && trimmed.endsWith("]"))
+    ) {
+      try {
+        const parsed = JSON.parse(trimmed);
+        if (typeof parsed === "string") {
+          str = parsed;
+        } else if (parsed && typeof parsed === "object") {
+          if (parsed.message && typeof parsed.message === "string") {
+            str = parsed.message;
+          } else if (parsed.error) {
+            if (typeof parsed.error === "string") {
+              str = parsed.error;
+            } else if (typeof parsed.error === "object" && parsed.error.message) {
+              str = parsed.error.message;
+            } else {
+              break;
+            }
+          } else {
+            break;
+          }
+        } else {
+          break;
+        }
+      } catch {
+        break;
+      }
+    } else {
+      break;
+    }
+  }
+
+  const lower = str.toLowerCase();
+  if (
+    lower.includes("internal error encountered") ||
+    lower.includes('"code": 500') ||
+    lower.includes("status: internal") ||
+    lower === "internal"
+  ) {
+    return "DaRC is having a momentary hiccup connecting to the coaching service. Please try sending your message again in a moment.";
+  }
+  if (
+    lower.includes("failed to fetch") ||
+    lower.includes("network error") ||
+    lower.includes("fetch failed")
+  ) {
+    return "Unable to connect. Please check your internet connection and try again.";
+  }
+  if (
+    lower.includes("daily limit") ||
+    lower.includes("limit reached")
+  ) {
+    return str;
+  }
+  if (
+    lower.includes("rate limit") ||
+    lower.includes("quota exceeded") ||
+    lower.includes("resource has been exhausted") ||
+    lower.includes("429")
+  ) {
+    return "The coaching service is experiencing high traffic right now. Please wait a moment and try again.";
+  }
+
+  return str;
+}
+
 export function ChatInterface({ chatId }: { chatId: string | null }) {
   const router = useRouter();
   const { data: session, isPending: isSessionPending } = useSession();
@@ -144,7 +228,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
           try {
             const data = await response.json();
             if (data && data.error) {
-              errMsg = data.error;
+              errMsg = typeof data.error === "string" ? data.error : JSON.stringify(data.error);
               if (
                 response.status === 403 ||
                 errMsg.toLowerCase().includes("daily limit") ||
@@ -170,10 +254,22 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
             );
             await refreshLimitStats();
             setIsTyping(false);
+            setTypingStatus("");
             return; // Exit silently
           }
 
-          throw new Error(errMsg);
+          if (savedUserMsgId) {
+            try {
+              await deleteMessage(savedUserMsgId);
+            } catch {
+              // ignore
+            }
+          }
+
+          setError(formatChatErrorMessage(errMsg));
+          setIsTyping(false);
+          setTypingStatus("");
+          return;
         }
 
         // Refresh daily limit usage stats immediately
@@ -209,6 +305,8 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
             );
           });
         };
+
+        let streamError: string | null = null;
 
         while (true) {
           const { value, done: doneReading } = await reader.read();
@@ -249,14 +347,26 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
                     }
                   }
                 }
+              } else if (event.type === "status") {
+                if (event.message) {
+                  setTypingStatus(event.message);
+                }
               } else if (event.type === "error") {
-                throw new Error(event.error);
+                streamError = formatChatErrorMessage(event.error);
+                break;
               }
-            } catch (pErr) {
-              if (pErr instanceof Error && pErr.message !== "Unexpected token") {
-                throw pErr;
-              }
+            } catch {
+              // Ignore incomplete JSON stream chunks
             }
+          }
+
+          if (streamError) {
+            try {
+              await reader.cancel();
+            } catch {
+              // ignore
+            }
+            break;
           }
         }
 
@@ -264,6 +374,29 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         if (rafId !== null) {
           cancelAnimationFrame(rafId);
         }
+
+        if (streamError) {
+          // If a coach message was partially created, remove it so there's no broken bubble
+          if (coachMsgCreated) {
+            setMessages((prev) => prev.filter((msg) => msg.id !== coachMessageId));
+          }
+
+          // If the message failed, clean up the orphaned user message from the database
+          // so the conversation history doesn't become corrupted with consecutive USER messages
+          if (savedUserMsgId) {
+            try {
+              await deleteMessage(savedUserMsgId);
+            } catch {
+              // ignore
+            }
+          }
+
+          setError(streamError);
+          setIsTyping(false);
+          setTypingStatus("");
+          return;
+        }
+
         if (pendingText) {
           setMessages((prev) =>
             prev.map((msg) =>
@@ -305,12 +438,14 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
         }
       } catch (err: unknown) {
         console.error("[DARC Error]", err);
-        const errorMessage =
+        const rawMessage =
           err instanceof Error ? err.message : "Connection interrupted.";
+        const formattedMessage = formatChatErrorMessage(rawMessage);
+
         // Do not show error on frontend if it mentions daily limit/rate limit
         if (
-          errorMessage.toLowerCase().includes("daily limit") ||
-          errorMessage.toLowerCase().includes("limit reached")
+          rawMessage.toLowerCase().includes("daily limit") ||
+          rawMessage.toLowerCase().includes("limit reached")
         ) {
           // Safe-guard to remove user message if it was somehow saved but failed later
           if (savedUserMsgId) {
@@ -327,9 +462,18 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
           );
           await refreshLimitStats();
         } else {
-          setError(errorMessage);
+          // Clean up orphaned message in DB on unexpected network/server crash
+          if (savedUserMsgId) {
+            try {
+              await deleteMessage(savedUserMsgId);
+            } catch {
+              // ignore
+            }
+          }
+          setError(formattedMessage);
         }
         setIsTyping(false);
+        setTypingStatus("");
       }
     },
     [chatId, localChatId, session, refreshChats, refreshLimitStats, limitStats],
