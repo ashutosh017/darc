@@ -20,7 +20,16 @@ export default function LandingPageClient() {
       setScrolled(window.scrollY > 50);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    // Refresh ScrollTrigger calculations after initial layout and fonts load
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 500);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(refreshTimer);
+    };
   }, []);
 
   useGSAP(
@@ -106,18 +115,23 @@ export default function LandingPageClient() {
           ease: "power2.out",
         });
 
-        gsap.from(".pricing-card", {
-          scrollTrigger: {
-            trigger: ".pricing-section",
-            start: "top 80%",
-            once: true,
+        gsap.fromTo(
+          ".pricing-card",
+          { autoAlpha: 0, y: 30 },
+          {
+            scrollTrigger: {
+              trigger: ".pricing-section",
+              start: "top 85%",
+              once: true,
+            },
+            autoAlpha: 1,
+            y: 0,
+            stagger: 0.15,
+            duration: 0.8,
+            ease: "power2.out",
+            clearProps: "all",
           },
-          y: 30,
-          autoAlpha: 0,
-          stagger: 0.15,
-          duration: 0.8,
-          ease: "power2.out",
-        });
+        );
 
         gsap.from(".closing-cta", {
           scrollTrigger: {
@@ -144,7 +158,7 @@ export default function LandingPageClient() {
             ".pricing-card",
             ".closing-cta",
           ],
-          { autoAlpha: 1, y: 0 },
+          { autoAlpha: 1, y: 0, clearProps: "all" },
         );
       });
     },
@@ -381,7 +395,7 @@ export default function LandingPageClient() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-3xl mx-auto">
               {/* Monthly Plan */}
-              <div className="pricing-card invisible group relative rounded-2xl border border-stone-700/60 bg-[#1C1917] p-8 flex flex-col transition-all duration-300 hover:border-stone-600 hover:bg-[#1F1C1A]">
+              <div className="pricing-card group relative rounded-2xl border border-stone-700/60 bg-[#1C1917] p-8 flex flex-col transition-colors duration-300 hover:border-stone-600 hover:bg-[#1F1C1A]">
                 <p className="text-xs uppercase tracking-[0.15em] text-stone-400 font-medium mb-6">
                   Monthly
                 </p>
@@ -411,7 +425,7 @@ export default function LandingPageClient() {
               </div>
 
               {/* Yearly Plan — Recommended */}
-              <div className="pricing-card invisible group relative rounded-2xl p-[1px] bg-gradient-to-b from-amber-500/60 via-rose-500/30 to-stone-700/30">
+              <div className="pricing-card group relative rounded-2xl p-[1px] bg-gradient-to-b from-amber-500/60 via-rose-500/30 to-stone-700/30">
                 <div className="relative rounded-2xl bg-[#1C1917] p-8 flex flex-col h-full">
                   <div className="flex items-center justify-between mb-6">
                     <p className="text-xs uppercase tracking-[0.15em] text-stone-400 font-medium">
