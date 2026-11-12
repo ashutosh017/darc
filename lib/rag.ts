@@ -1,7 +1,17 @@
 import { Pinecone } from "@pinecone-database/pinecone";
 
+let pineconeClient: Pinecone | null = null;
+
+function getPineconeClient(apiKey: string): Pinecone {
+  if (!pineconeClient) {
+    pineconeClient = new Pinecone({ apiKey });
+  }
+  return pineconeClient;
+}
+
 /**
  * Queries Pinecone vector index for relevant relationship coaching transcripts based on a dense embedding.
+ * Uses a singleton Pinecone instance and topK=3 to minimize latency and prompt bloat.
  */
 export async function getPineconeContext(queryText: string): Promise<string> {
   const pineconeApiKey = process.env.PINECONE_API_KEY;
@@ -11,8 +21,7 @@ export async function getPineconeContext(queryText: string): Promise<string> {
   }
 
   try {
-    const pc = new Pinecone({ apiKey: pineconeApiKey });
-    console.log("query text: ", queryText);
+    const pc = getPineconeClient(pineconeApiKey);
     const embeddingResult = await pc.inference.embed({
       model: "multilingual-e5-large",
       inputs: [queryText],
@@ -37,11 +46,9 @@ export async function getPineconeContext(queryText: string): Promise<string> {
 
     const queryResponse = await index.query({
       vector: queryVector,
-      topK: 5,
+      topK: 3,
       includeMetadata: true,
     });
-
-    console.log("query response: ", queryResponse.matches.map((m)=>m.metadata));
 
     if (!queryResponse.matches || queryResponse.matches.length === 0) {
       return "";

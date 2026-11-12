@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { GoogleGenAI } from "@google/genai";
 import { auth } from "@/lib/auth";
 import { MAX_WORD_LIMIT } from "@/lib/coaching";
+import { runWithChatLogger, logToFile } from "@/lib/logger";
 import { darcChatGraph, StreamEvent } from "./graph";
 
 export async function POST(req: NextRequest) {
@@ -60,20 +61,22 @@ export async function POST(req: NextRequest) {
         };
 
         try {
-          // Execute LangGraph pipeline
-          await darcChatGraph.invoke(
-            {
-              userId: session.user.id,
-              message,
-              chatId,
-              ai,
-            },
-            {
-              configurable: {
-                sendEvent,
+          await runWithChatLogger({ chatId, userId: session.user.id }, async () => {
+            // Execute LangGraph pipeline
+            await darcChatGraph.invoke(
+              {
+                userId: session.user.id,
+                message,
+                chatId,
+                ai,
               },
-            }
-          );
+              {
+                configurable: {
+                  sendEvent,
+                },
+              }
+            );
+          });
 
           controller.close();
         } catch (streamError: unknown) {
@@ -82,6 +85,10 @@ export async function POST(req: NextRequest) {
             streamError instanceof Error && streamError.message
               ? streamError.message
               : "An unexpected error occurred.";
+          await logToFile(
+            `\n[CHAT REQUEST ERROR] ${errorMessage}\n`,
+            { chatId }
+          );
           sendEvent({ type: "error", error: errorMessage });
           controller.close();
         }

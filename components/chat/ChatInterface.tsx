@@ -148,6 +148,7 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const skipNextFetchRef = useRef(false);
+  const isGeneratingRef = useRef(false);
   const searchParams = useSearchParams();
   // Sync localChatId when the chatId prop changes
   useEffect(() => {
@@ -189,7 +190,12 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
       };
 
       setMessages((prev) => [...prev, userMessage]);
+      isGeneratingRef.current = true;
       setIsTyping(true);
+      // Bring the newly submitted user prompt into view immediately
+      requestAnimationFrame(() => {
+        scrollToBottom();
+      });
 
       let savedUserMsgId: string | null = null;
       try {
@@ -472,6 +478,8 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
           }
           setError(formattedMessage);
         }
+      } finally {
+        isGeneratingRef.current = false;
         setIsTyping(false);
         setTypingStatus("");
       }
@@ -552,8 +560,10 @@ export function ChatInterface({ chatId }: { chatId: string | null }) {
   }, []);
 
   useEffect(() => {
+    // While the response is generating, do not automatically scroll
+    if (isGeneratingRef.current) return;
     scrollToBottom();
-  }, [messages, isTyping, scrollToBottom]);
+  }, [messages, scrollToBottom]);
 
   if (isSessionPending) return null;
 

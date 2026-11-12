@@ -3,7 +3,7 @@ import { GoogleGenAI } from "@google/genai";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { GEMMA_4_31B_IT } from "@/lib/models";
-import { logToFile } from "@/lib/logger";
+import { logChatTurn, runWithChatLogger } from "@/lib/logger";
 import { getPineconeContext } from "@/lib/rag";
 import {
   SYSTEM_INSTRUCTION,
@@ -97,149 +97,170 @@ export async function POST(req: NextRequest) {
         };
 
         try {
-          // 4. Process translation & search query generation
-          sendEvent({ type: "status", message: "Analyzing query & context" });
-          const { englishMessage, searchQuery } = await processQueryAndGenerateSearchQuery(
-            ai,
-            contents
-          );
+          await runWithChatLogger({ chatId, userId: session.user.id }, async () => {
+            // 4. Process translation & search query generation
+            sendEvent({ type: "status", message: "Analyzing query & context" });
+            const { englishMessage, searchQuery } = await processQueryAndGenerateSearchQuery(
+              ai,
+              contents
+            );
 
-          // 5. Fetch user details & profile context
-          const user = await db.user.findUnique({
-            where: { id: session.user.id },
-            select: {
-              id: true,
-              name: true,
-              email: true,
-              dob: true,
-              age: true,
-              educationSchool: true,
-              educationDegree: true,
-              educationYear: true,
-              employmentDetails: true,
-              datingGoals: true,
-              seekingReason: true,
-              location: true,
-              annualIncome: true,
-              instaUrl: true,
-              linkedinUrl: true,
-              xUrl: true,
-              dailyLimit: true,
-              chatsUsed: true,
-              profileSummary: true,
-            },
-          });
-
-          const profileContext = await getUserProfileContext(user, ai);
-
-          // 6. Check daily limit and increment usage
-          const startOfDay = new Date();
-          startOfDay.setUTCHours(0, 0, 0, 0);
-
-          const lastUserMessage = await db.message.findFirst({
-            where: {
-              chat: { user_id: session.user.id },
-              role: "USER",
-            },
-            orderBy: { createdAt: "desc" },
-          });
-
-          if (!lastUserMessage || lastUserMessage.createdAt < startOfDay) {
-            await db.user.update({
+            // 5. Fetch user details & profile context
+            const user = await db.user.findUnique({
               where: { id: session.user.id },
-              data: { chatsUsed: 0 },
+              select: {
+                id: true,
+                name: true,
+                email: true,
+                dob: true,
+                age: true,
+                educationSchool: true,
+                educationDegree: true,
+                educationYear: true,
+                employmentDetails: true,
+                datingGoals: true,
+                seekingReason: true,
+                location: true,
+                annualIncome: true,
+                instaUrl: true,
+                linkedinUrl: true,
+                xUrl: true,
+                dailyLimit: true,
+                chatsUsed: true,
+                profileSummary: true,
+              },
             });
-            if (user) {
-              user.chatsUsed = 0;
+
+            const profileContext = await getUserProfileContext(user, ai);
+
+            // 6. Check daily limit and increment usage
+            const startOfDay = new Date();
+            startOfDay.setUTCHours(0, 0, 0, 0);
+
+            const lastUserMessage = await db.message.findFirst({
+              where: {
+                chat: { user_id: session.user.id },
+                role: "USER",
+              },
+              orderBy: { createdAt: "desc" },
+            });
+
+            if (!lastUserMessage || lastUserMessage.createdAt < startOfDay) {
+              await db.user.update({
+                where: { id: session.user.id },
+                data: { chatsUsed: 0 },
+              });
+              if (user) {
+                user.chatsUsed = 0;
+              }
             }
-          }
 
-          if (user && user.chatsUsed >= user.dailyLimit) {
-            sendEvent({
-              type: "error",
-              error: `You have reached your daily limit of ${user.dailyLimit} prompts. Please try again tomorrow.`,
-            });
-            controller.close();
-            return;
-          }
-
-          await db.user.update({
-            where: { id: session.user.id },
-            data: { chatsUsed: { increment: 1 } },
-          });
-
-          // 7. Vector context retrieval
-          let context = "";
-          if (searchQuery) {
-            sendEvent({ type: "status", message: "Retrieving coaching insights" });
-            context = await getPineconeContext(searchQuery);
-          }
-
-          // 8. Formulate dynamic system instruction with context and user profile
-          let dynamicSystemInstruction = SYSTEM_INSTRUCTION;
-          if (profileContext) {
-            dynamicSystemInstruction = `${dynamicSystemInstruction}\n\n${profileContext}`;
-          }
-          if (context) {
-            dynamicSystemInstruction = `${dynamicSystemInstruction}\n\nYou have access to the following relevant context retrieved from your coaching resource base (transcripts of your videos). Use this context to answer the user's query if it is relevant. Do not mention search, databases, or context. Maintain your persona and tone as DaRC.\n\nRetrieved Context:\n${context}`;
-          }
-
-          // Update the last user prompt in contents with the translated English message for Gemini generation
-          if (contents.length > 0 && contents[contents.length - 1].role === "user") {
-            contents[contents.length - 1] = {
-              role: "user",
-              parts: [{ text: englishMessage }],
-            };
-          }
-
-          // 9. Log Execution
-          logToFile(`\n--- [DARC Execution Log] ---`);
-          logToFile(`[USER PROMPT]\n${message}\n`);
-          logToFile(`[ENGLISH TRANSLATION]\n${englishMessage}\n`);
-          logToFile(
-            `[VECTOR DB RETRIEVAL]\nGenerated Query: ${
-              searchQuery ? `"${searchQuery}"` : "NONE"
-            }\nRetrieved Context Included: ${context ? "YES" : "NO"}\n`
-          );
-          logToFile(
-            `[OVERALL AI PROMPT]\n--- System Instruction ---\n${dynamicSystemInstruction}\n\n--- Contents ---\n${JSON.stringify(
-              contents,
-              null,
-              2
-            )}\n`
-          );
-
-          // 10. Stream response with Gemini 3.1 Flash Lite
-          sendEvent({ type: "status", message: "Formulating response" });
-
-          const streamResponse = await ai.models.generateContentStream({
-            model: GEMMA_4_31B_IT,
-            contents,
-            config: {
-              systemInstruction: dynamicSystemInstruction,
-              temperature: 1.15,
-              topP: 0.95,
-              topK: 40,
-            },
-          });
-
-          let fullBuffer = "";
-          let originalResponseBuffer = "";
-          for await (const chunk of streamResponse) {
-            const chunkText = chunk.text || "";
-            originalResponseBuffer += chunkText;
-            fullBuffer += chunkText.toLowerCase();
-            if (BANNED_PHRASES.some((phrase) => fullBuffer.includes(phrase))) {
-              logToFile(
-                `[GENERATED RESPONSE]\n🛑 Stream terminated early due to banned phrase.\n${originalResponseBuffer}\n`
-              );
+            if (user && user.chatsUsed >= user.dailyLimit) {
+              sendEvent({
+                type: "error",
+                error: `You have reached your daily limit of ${user.dailyLimit} prompts. Please try again tomorrow.`,
+              });
               controller.close();
               return;
             }
-            sendEvent({ type: "text", content: chunkText });
-          }
-          logToFile(`[GENERATED RESPONSE]\n${originalResponseBuffer}\n`);
-          controller.close();
+
+            await db.user.update({
+              where: { id: session.user.id },
+              data: { chatsUsed: { increment: 1 } },
+            });
+
+            // 7. Vector context retrieval
+            let context = "";
+            if (searchQuery) {
+              sendEvent({ type: "status", message: "Retrieving coaching insights" });
+              context = await getPineconeContext(searchQuery);
+            }
+
+            // 8. Formulate dynamic system instruction with context and user profile
+            let dynamicSystemInstruction = SYSTEM_INSTRUCTION;
+            if (profileContext) {
+              dynamicSystemInstruction = `${dynamicSystemInstruction}\n\n${profileContext}`;
+            }
+            if (context) {
+              dynamicSystemInstruction = `${dynamicSystemInstruction}\n\nYou have access to the following relevant context retrieved from your coaching resource base (transcripts of your videos). Use this context to answer the user's query if it is relevant. Do not mention search, databases, or context. Maintain your persona and tone as DaRC.\n\nRetrieved Context:\n${context}`;
+            }
+
+            // Update the last user prompt in contents with the translated English message for Gemini generation
+            if (contents.length > 0 && contents[contents.length - 1].role === "user") {
+              contents[contents.length - 1] = {
+                role: "user",
+                parts: [{ text: englishMessage }],
+              };
+            }
+
+            // 9. Prepare attached components list
+            const attachedComponents: string[] = [
+              "System Prompt (DaRC Persona Guidelines)",
+            ];
+            if (profileContext) {
+              attachedComponents.push("User Profile Context");
+            }
+            if (context) {
+              attachedComponents.push("Additional Context (Video Transcripts)");
+            }
+            if (contents.length > 1) {
+              attachedComponents.push(`Conversation History (${contents.length - 1} turns)`);
+            }
+            attachedComponents.push("User's Query");
+
+            // 10. Stream response
+            sendEvent({ type: "status", message: "Formulating response" });
+
+            const streamResponse = await ai.models.generateContentStream({
+              model: GEMMA_4_31B_IT,
+              contents,
+              config: {
+                systemInstruction: dynamicSystemInstruction,
+                temperature: 1.15,
+                topP: 0.95,
+                topK: 40,
+              },
+            });
+
+            let fullBuffer = "";
+            let originalResponseBuffer = "";
+            for await (const chunk of streamResponse) {
+              const chunkText = chunk.text || "";
+              originalResponseBuffer += chunkText;
+              fullBuffer += chunkText.toLowerCase();
+              if (BANNED_PHRASES.some((phrase) => fullBuffer.includes(phrase))) {
+                await logChatTurn(
+                  {
+                    userPrompt: message,
+                    searchQuery,
+                    retrievedContext: context,
+                    attachedComponents,
+                    statusNotice: "🛑 Policy constraint: Stream terminated early due to banned phrase.",
+                    finalResponse: originalResponseBuffer,
+                    chatId,
+                  },
+                  { chatId }
+                );
+                controller.close();
+                return;
+              }
+              sendEvent({ type: "text", content: chunkText });
+            }
+
+            await logChatTurn(
+              {
+                userPrompt: message,
+                searchQuery,
+                retrievedContext: context,
+                attachedComponents,
+                finalResponse: originalResponseBuffer,
+                chatId,
+              },
+              { chatId }
+            );
+
+            controller.close();
+          });
         } catch (streamError: unknown) {
           console.error("[DARC Stream Error]", streamError);
           sendEvent({ type: "error", error: "An unexpected error occurred." });

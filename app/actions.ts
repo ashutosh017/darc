@@ -6,6 +6,7 @@ import { headers } from "next/headers";
 import { Role } from "@/lib/generated/prisma";
 import { GoogleGenAI } from "@google/genai";
 import { GEMINI_3_1_FLASH_LITE } from "@/lib/models";
+import { registerNewChat } from "@/lib/logger";
 
 const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -19,30 +20,44 @@ export async function createChat(title?: string) {
   const session = await getSession();
   if (!session) throw new Error("Unauthorized");
 
-  let chatTitle = title || "New Chat"
-  if (title) {
-    try {
-      const apiKey = process.env.GEMINI_API_KEY;
-      const ai = new GoogleGenAI({ apiKey });
-      const gen_title = await ai.models.generateContent({
-        model: GEMINI_3_1_FLASH_LITE,
-        contents: `Create a short, concise, min(2 words) max(10 words) title for a relationship chat started with this message: "${title}". Return ONLY the title text, with no quotes, prefixes, or punctuation.`,
-      });
-      if (gen_title?.text) {
-        chatTitle = gen_title.text.trim().replace(/^["']|["']$/g, '');
-      }
-    } catch (error) {
-      console.error("[createChat] Failed to generate AI title:", error);
-      chatTitle = title.slice(0, 30) + (title.length > 30 ? "..." : "");
-    }
-  }
+  const initialTitle = title
+    ? title.slice(0, 30) + (title.length > 30 ? "..." : "")
+    : "New Chat";
 
-  return await db.chat.create({
+  // Create chat immediately so client can start streaming without waiting for title LLM
+  const newChat = await db.chat.create({
     data: {
-      title: chatTitle,
+      title: initialTitle,
       user_id: session.user.id,
     },
   });
+
+  registerNewChat(newChat.id, newChat.createdAt).catch(() => {});
+
+  // Generate polished AI title asynchronously in the background
+  if (title && process.env.GEMINI_API_KEY) {
+    (async () => {
+      try {
+        const apiKey = process.env.GEMINI_API_KEY;
+        const ai = new GoogleGenAI({ apiKey });
+        const gen_title = await ai.models.generateContent({
+          model: GEMINI_3_1_FLASH_LITE,
+          contents: `Create a short, concise, min(2 words) max(10 words) title for a relationship chat started with this message: "${title}". Return ONLY the title text, with no quotes, prefixes, or punctuation.`,
+        });
+        if (gen_title?.text) {
+          const polishedTitle = gen_title.text.trim().replace(/^["']|["']$/g, "");
+          await db.chat.update({
+            where: { id: newChat.id },
+            data: { title: polishedTitle },
+          });
+        }
+      } catch (error) {
+        console.error("[createChat] Background AI title generation error:", error);
+      }
+    })().catch(() => {});
+  }
+
+  return newChat;
 }
 
 export async function saveMessage(chatId: string, text: string, role: Role) {
